@@ -1,0 +1,116 @@
+[
+  {
+    "name": "Mesin Es Kristal 1 Ton Harian",
+    "slug": "mesin-es-kristal-1-ton",
+    "description": "Mesin es kristal kapasitas 1 ton per hari dengan kompresor berkualitas tinggi dan desain modern. Sangat sesuai untuk usaha kecil menengah es batu.",
+    "shortDescription": "Kapasitas 1 ton/hari, daya listrik 2200 Watt, garansi 1 tahun",
+    "capacity": "1 Ton/Hari",
+    "capacityValue": 1,
+    "price": 50000000,
+    "priceDisplay": "Rp 50.000.000",
+    "specifications": [
+      { "label": "Daya Listrik", "value": "2200 Watt" },
+      { "label": "Kapasitas", "value": "1 Ton/Hari" },
+      { "label": "Refrigeran", "value": "R404A" },
+      { "label": "Dimensi", "value": "120x80x150 cm" },
+      { "label": "Berat", "value": "250 kg" },
+      { "label": "Material", "value": "Stainless Steel 304 Food Grade" }
+    ],
+    "images": [
+      "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+      "https://firebasestorage.googleapis.com/v0/b/mesin-es-kristal-web.appspot.com/o/products%2F1-ton-1.jpg?alt=media&token=sample-token-1",
+      "https://firebasestorage.googleapis.com/v0/b/mesin-es-kristal-web.appspot.com/o/products%2F1-ton-2.jpg?alt=media&token=sample-token-2"
+    ],
+    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+    "videoUrl": "dQw4w9WgXcQ",
+    "category": "kecil",
+    "isActive": true,
+    "isFeatured": true,
+    "stock": "tersedia",
+    "warranty": "1 Tahun (Kompresor) / 6 Bulan (Sparepart)",
+    "material": "Stainless Steel 304 Food Grade",
+    "certifications": ["SNI", "ISO 9001", "Food Grade"],
+    "roiEstimation": {
+      "dailyRevenue": 3000000,
+      "dailyCost": 850000,
+      "dailyProfit": 2150000,
+      "paybackPeriod": "8 bulan"
+    }
+  },
+  {
+    "name": "Mesin Es Kristal 3 Ton Harian",
+    "slug": "mesin-es-kristal-3-ton",
+    "description": "Mesin es kristal kapasitas 3 ton per hari desain industrial, kompresor kuat dan efisien. Cocok untuk usaha es batu skala menengah.",
+    "shortDescription": "Kapasitas 3 ton/hari, daya listrik 4000 Watt, garansi 1 tahun",
+    "capacity": "3 Ton/Hari",
+    "capacityValue": 3,
+    "price": 120000000,
+    "priceDisplay": "Rp 120.000.000",
+    "specifications": [
+      { "label": "Daya Listrik", "value": "4000 Watt" },
+      { "label": "Kapasitas", "value": "3 Ton/Hari" },
+      { "label": "Refrigeran", "value": "R404A" },
+      { "label": "Dimensi", "value": "180x100x180 cm" },
+      { "label": "Berat", "value": "450 kg" },
+      { "label": "Material", "value": "Stainless Steel 316 Food Grade" }
+    ],
+    "images": [
+      "https://img.youtube.com/vi_subscribe/dQw4w9WgXcQ/maxresdefault.jpg",
+      "https://firebasestorage.googleapis.com/v0/b/mesin-es-kristal-web.appspot.com/o/products%2F3-ton-1.jpg?alt=media&token=sample-token-3",
+      "https://firebasestorage.googleapis.com/v0/b/mesin-es-kristal-web.appspot.com/o/products%2F3-ton-2.jpg?alt=media&token=sample-token-4"
+    ],
+    "thumbnail": "https://img.youtube.com/vi_subscribe/dQw4w9WgXcQ/maxresdefault.jpg",
+    "videoUrl": "subscribewatch",
+    "category": "menengah",
+    "isActive": true,
+    "isFeatured": true,
+    "stock": "tersedia",
+    "warranty": "1 Tahun (Kompresor) / 6 Bulan (Sparepart)",
+    "material": "Stainless Steel 316 Food Grade",
+    "certifications": ["SNI", "ISO 9001"],
+    "roiEstimation": {
+      "dailyRevenue": 9000000,
+      "dailyCost": 2100000,
+      "dailyProfit": 6900000,
+      "paybackPeriod": "6 bulan"
+    }
+  },
+  {
+    "name": "Mesin Es Kristal 5 Ton Harian",
+    "slug": "mesin-es-kristal-5-ton",
+    "description": "Mesin es kristal kapasitas 5 ton per hari untuk skala besar, kompresor industrial dan fitur lengkap. Memenuhi kebutuhan produksi masif.",
+    "shortDescription": "Kapasitas 5 ton/hari, daya listrik 6000 Watt, garansi 1 tahun",
+    "capacity": "5 Ton/Hari",
+    "capacityValue": 5,
+    "price": 200000000,
+    "priceDisplay": "Rp 200.000.000",
+    "specifications": [
+      { "label": "Daya Listrik", "value": "6000 Watt" },
+      { "label": "Kapasitas", "value": "5 Ton/Hari" },
+      { "label": "Refrigeran", "value": "R404A" },
+      { "label": "Dimensi", "value": "200x120x200 cm" },
+      { "label": "Berat", "value": "750 kg" },
+      { "label": "Material", "value": "Stainless Steel 316 Food Grade" }
+    ],
+    "images": [
+      "https://img.youtube.com/vi_uploaddqw4w9WgXcQ/maxresdefault.jpg",
+      "https://firebasestorage.googleapis.com/v0/b/mesin-es-kristal-web.appspot.com/o/products%2F5-ton-1.jpg?alt=media&token=sample-token-5",
+      "https://firebasestorage.googleapis.com/v0/b/mesin-es-kristal-web.appspot.com/o/products%2F5-ton-2.jpg?alt=media&token=sample-token-6"
+    ],
+    "thumbnail": "https://img.youtube.com/vi_uploaddqw4w9WgXcQ/maxresdefault.jpg",
+    "videoUrl": "uploaddqw4w9WgXcQ",
+    "category": "besar",
+    "isActive": true,
+    "isFeatured": false,
+    "stock": "tersedia",
+    "warranty": "1 Tahun (Kompresor) / 6 Bulan (Sparepart)",
+    "material": "Stainless Steel 316 Food Grade",
+    "certifications": ["SNI", "ISO 9001", "Food Grade"],
+    "roiEstimation": {
+      "dailyRevenue": 15000000,
+      "dailyCost": 3500000,
+      "dailyProfit": 11500000,
+      "paybackPeriod": "5 bulan"
+    }
+  }
+]

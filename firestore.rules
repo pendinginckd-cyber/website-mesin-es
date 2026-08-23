@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function: cek apakah user ada di collection admins
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Products: read publik, write admin
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Articles: read publik (filter isPublished di app), write admin
+    match /articles/{articleId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Testimonials: read publik (jika aktif), write admin
+    match /testimonials/{testimonialId} {
+      allow read: if resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // FAQs: read publik (jika aktif), write admin
+    match /faqs/{faqId} {
+      allow read: if resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Videos: read publik (filter isActive di app), write admin
+    match /videos/{videoId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Galleries: read publik (jika aktif), write admin
+    match /galleries/{galleryId} {
+      allow read: if resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Banners: read publik, write admin
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Leads: read/write admin only
+    match /leads/{leadId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ContactInfo: read publik, write admin
+    match /contactInfo/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // AboutContent: read publik, write admin
+    match /aboutContent/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // AboutStats: read publik (jika aktif), write admin
+    match /aboutStats/{statId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // AboutGallery: read publik (jika aktif), write admin
+    match /aboutGallery/{galleryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Keunggulan Settings: read publik, write admin
+    match /keunggulanSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Keunggulan Items: read publik (jika aktif), write admin
+    match /keunggulanItems/{itemId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admins: read/write hanya admin yang bersangkutan
+    match /admins/{adminId} {
+      allow read: if request.auth != null && request.auth.uid == adminId;
+      allow write: if request.auth != null && request.auth.uid == adminId;
+    }
+  }
+}

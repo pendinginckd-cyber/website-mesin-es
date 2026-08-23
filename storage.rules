@@ -1,0 +1,58 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper function: cek apakah user admin
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // Products images: read publik, write admin
+    match /products/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Article images: read publik, write admin
+    match /articles/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Testimonial photos: read publik, write admin
+    match /testimonials/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Gallery photos: read publik, write admin
+    match /galleries/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Banner images: read publik, write admin
+    match /banners/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admin avatars: read publik, write admin
+    match /admin/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // About page images: read publik, write admin
+    match /about/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // About gallery images: read publik, write admin
+    match /about-gallery/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
