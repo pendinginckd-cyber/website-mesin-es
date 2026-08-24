@@ -54,5 +54,11 @@ service firebase.storage {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // Review photos: read publik, write admin
+    match /reviews/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }
