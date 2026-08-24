@@ -32,8 +32,12 @@ export const metadata: Metadata = {
     siteName: "Mesin Es Kristal",
   },
   icons: {
-    icon: "/icon.png",
-    apple: "/icon.png",
+    icon: [
+      { url: "/icon.png?v=3", sizes: "32x32", type: "image/png" },
+      { url: "/icon.png?v=3", sizes: "192x192", type: "image/png" },
+      { url: "/icon.png?v=3", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/icon.png?v=3",
   },
 };
 
