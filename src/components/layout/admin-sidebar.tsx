@@ -16,6 +16,7 @@ import {
   Phone,
   Building2,
   Truck,
+  Eye,
 } from "lucide-react";
 
 const navItems = [
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/admin/leads", icon: Users, label: "Leads" },
   { href: "/admin/tentang", icon: Building2, label: "Tentang" },
   { href: "/admin/keunggulan", icon: Truck, label: "Keunggulan" },
+  { href: "/admin/visitor-stats", icon: Eye, label: "Visitor Stats" },
   { href: "/admin/kontak", icon: Phone, label: "Kontak" },
 ];
 

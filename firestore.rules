@@ -91,6 +91,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // VisitorStats: read publik, write admin
+    match /visitorStats/{docId} {
+      allow read: if true;
+      allow write: if isAdmin() || request.auth == null; // Allow anonymous writes for visitor count
+    }
+
     // Admins: read/write hanya admin yang bersangkutan
     match /admins/{adminId} {
       allow read: if request.auth != null && request.auth.uid == adminId;

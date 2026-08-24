@@ -39,7 +39,7 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
               href="/produk"
-              className="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg font-semibold transition-colors text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg font-semibold transition-colors text-lg animate-pulse-glow tap-effect"
             >
               Lihat Produk
               <ArrowRight className="w-5 h-5" />
@@ -49,7 +49,7 @@ export function HeroSection() {
               href={`https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/30 px-6 py-3 rounded-lg font-semibold transition-colors text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/30 px-6 py-3 rounded-lg font-semibold transition-colors text-lg tap-effect"
             >
               <Phone className="w-5 h-5" />
               Konsultasi Gratis

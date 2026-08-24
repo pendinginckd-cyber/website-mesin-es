@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Specification } from "@/types/product";
 import { ProductGallery } from "@/components/public/product-gallery";
+import { ProductCta } from "@/components/public/product-cta";
+import { CopyLink } from "@/components/shared/copy-link";
 
 const PRICE_VALID_UNTIL = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
@@ -151,7 +153,6 @@ export default async function ProdukDetailPage({ params }: PageProps) {
 
   const stockStatus = getStockStatus(product.stock);
   const StockIcon = stockStatus.icon;
-  const whatsappUrl = `https://wa.me/6281326440039?text=${encodeURIComponent(`Halo, saya tertarik dengan ${product.name} - ${product.priceDisplay}`)}`;
 
   return (
     <>
@@ -228,19 +229,11 @@ export default async function ProdukDetailPage({ params }: PageProps) {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
-                <Button variant="primary" size="lg" className="w-full">
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Pesan via WhatsApp
-                </Button>
-              </a>
-              <a href="tel:+6281326440039" className="flex-1">
-                <Button variant="outline" size="lg" className="w-full">
-                  <Phone className="w-5 h-5 mr-2" />
-                  Hubungi Kami
-                </Button>
-              </a>
+            <ProductCta product={product} />
+
+            <div className="flex items-center justify-between mt-2">
+              <CopyLink />
+              <span className="text-xs text-gray-400">ID: {product.slug}</span>
             </div>
 
             <Card>

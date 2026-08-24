@@ -8,6 +8,8 @@ import { TestimoniSection } from "@/components/public/testimoni-section";
 import { FaqSection } from "@/components/public/faq-section";
 import { CTASection } from "@/components/public/cta-section";
 import { FloatingWhatsApp } from "@/components/public/floating-whatsapp";
+import { VisitorStatsDisplay } from "@/components/public/visitor-stats-display";
+import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { useState, useEffect } from "react";
 import { getFeaturedProducts, getProducts } from "@/lib/firestore/products";
 import { Product } from "@/types/product";
@@ -42,17 +44,30 @@ export default function HomePage() {
     <>
       <HeroSection />
       <BannerCarousel />
-      <KeunggulanSection />
+      <ScrollReveal>
+        <KeunggulanSection />
+      </ScrollReveal>
       {!loading && (
-        <ProdukGrid
-          products={featuredProducts}
-          title="Produk Unggulan Kami"
-          showViewAll
-        />
+        <ScrollReveal>
+          <ProdukGrid
+            products={featuredProducts}
+            title="Produk Unggulan Kami"
+            showViewAll
+          />
+        </ScrollReveal>
       )}
-      <FaqSection />
-      <TestimoniSection />
-      <CTASection />
+      <ScrollReveal>
+        <FaqSection />
+      </ScrollReveal>
+      <ScrollReveal>
+        <TestimoniSection />
+      </ScrollReveal>
+      <ScrollReveal>
+        <VisitorStatsDisplay variant="section" />
+      </ScrollReveal>
+      <ScrollReveal>
+        <CTASection />
+      </ScrollReveal>
       <FloatingWhatsApp />
     </>
   );

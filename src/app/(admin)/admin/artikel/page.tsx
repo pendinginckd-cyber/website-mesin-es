@@ -123,6 +123,8 @@ export default function ArtikelAdmin() {
     setLoading(true);
     try {
       const data = await getArticles();
+      console.log("Fetched articles count:", data.length);
+      console.log("Fetched articles:", data.map(a => ({ id: a.id, title: a.title, isPublished: a.isPublished })));
       setArticles(data);
     } catch (error) {
       console.error("Error fetching articles:", error);

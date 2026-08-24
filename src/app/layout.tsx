@@ -31,6 +31,10 @@ export const metadata: Metadata = {
     locale: "id_ID",
     siteName: "Mesin Es Kristal",
   },
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({

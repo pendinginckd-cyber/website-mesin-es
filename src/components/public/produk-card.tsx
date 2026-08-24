@@ -1,20 +1,28 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { Card, CardImage, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
+import { useContact } from "@/contexts/contact-context";
+import { SITE_URL } from "@/lib/constants";
 
 interface ProdukCardProps {
   product: Product;
 }
 
 export function ProdukCard({ product }: ProdukCardProps) {
+  const { contact } = useContact();
+  const waNumber = contact?.whatsappNumber || "6281326440039";
+
   const certBadge = product.certifications?.length
     ? product.certifications.join(", ")
     : null;
 
+  const priceText = product.priceDisplay || `Rp ${product.price?.toLocaleString("id-ID")}`;
   const whatsappMessage = encodeURIComponent(
-    `Halo, saya tertarik dengan ${product.name}. Bisa info lebih lanjut?`
+    `Halo, saya tertarik dengan ${product.name} - ${priceText}\n\n${SITE_URL}/produk/${product.slug}`
   );
 
   return (
@@ -29,7 +37,7 @@ export function ProdukCard({ product }: ProdukCardProps) {
 
       <Link
         href={`/produk/${product.slug}`}
-        className="block relative overflow-hidden aspect-[4/3]"
+        className="block relative overflow-hidden aspect-[4/3] tap-effect"
         aria-label={`Lihat detail ${product.name}`}
       >
         <CardImage
@@ -63,7 +71,7 @@ export function ProdukCard({ product }: ProdukCardProps) {
 
         <div className="mb-0.5">
           <span className="font-bold text-primary" style={{ fontSize: "10px" }}>
-            {product.priceDisplay || `Rp ${product.price.toLocaleString("id-ID")}`}
+            {priceText}
           </span>
           <span className="text-gray-500 ml-1" style={{ fontSize: "11px" }}>/ unit</span>
         </div>
@@ -71,16 +79,16 @@ export function ProdukCard({ product }: ProdukCardProps) {
         <div className="mt-auto flex flex-col gap-2" style={{ fontSize: "11px" }}>
           <Link
             href={`/produk/${product.slug}`}
-            className="text-primary font-medium hover:underline inline-flex items-center gap-1"
+            className="text-primary font-medium hover:underline inline-flex items-center gap-1 tap-effect"
           >
             Lihat Spesifikasi
             <ArrowRight className="w-3 h-3" />
           </Link>
           <Link
-            href={`https://wa.me/6281326440039?text=${whatsappMessage}`}
+            href={`https://wa.me/${waNumber}?text=${whatsappMessage}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary font-medium hover:underline inline-flex items-center gap-1"
+            className="text-primary font-medium hover:underline inline-flex items-center gap-1 tap-effect"
           >
             <MessageCircle className="w-3 h-3" />
              Nego Harga

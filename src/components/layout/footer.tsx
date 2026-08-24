@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Snowflake, MapPin, Phone, Mail, Clock } from "lucide-react";
 import { useContact } from "@/contexts/contact-context";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
+import { VisitorStatsDisplay } from "@/components/public/visitor-stats-display";
 
 const quickLinks = [
   { href: "/", label: "Beranda" },
@@ -53,7 +54,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm hover:text-primary transition-colors"
+                    className="text-sm hover:text-primary transition-colors tap-effect"
                   >
                     {link.label}
                   </Link>
@@ -120,6 +121,9 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+            <VisitorStatsDisplay variant="footer" />
+          </div>
           <p>&copy; {new Date().getFullYear()} Mesin Es Kristal. All rights reserved.</p>
         </div>
       </div>
