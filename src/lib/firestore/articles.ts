@@ -8,7 +8,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   limit,
   Timestamp,
   type Firestore,
@@ -28,53 +27,33 @@ export async function getArticles(params?: {
 }): Promise<Article[]> {
   if (!db) return [];
 
-  let q = query(getCollection(db), orderBy("publishedAt", "desc"));
+  // Fetch all articles first (no orderBy to avoid excluding docs without publishedAt)
+  let q = query(getCollection(db));
   if (params?.category) q = query(q, where("category", "==", params.category));
-  if (params?.limit) q = query(q, limit(params.limit));
 
-  try {
-    const snapshot = await getDocs(q);
-    let articles = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      publishedAt: doc.data().publishedAt?.toDate(),
-      createdAt: doc.data().createdAt?.toDate(),
-      updatedAt: doc.data().updatedAt?.toDate(),
-    })) as Article[];
+  const snapshot = await getDocs(q);
+  let articles = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    publishedAt: doc.data().publishedAt?.toDate(),
+    createdAt: doc.data().createdAt?.toDate(),
+    updatedAt: doc.data().updatedAt?.toDate(),
+  })) as Article[];
 
-    // Only filter by isPublished if explicitly provided
-    if (params?.isPublished !== undefined) {
-      articles = articles.filter((a) => a.isPublished === params.isPublished);
-    }
-
-    return articles;
-  } catch {
-    try {
-      const snapshot = await getDocs(getCollection(db));
-      let articles = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        publishedAt: doc.data().publishedAt?.toDate(),
-        createdAt: doc.data().createdAt?.toDate(),
-        updatedAt: doc.data().updatedAt?.toDate(),
-      })) as Article[];
-
-      // Only filter by isPublished if explicitly provided
-      if (params?.isPublished !== undefined) {
-        articles = articles.filter((a) => a.isPublished === params.isPublished);
-      }
-      if (params?.category) {
-        articles = articles.filter((a) => a.category === params.category);
-      }
-      articles.sort((a, b) => (b.publishedAt?.getTime() || 0) - (a.publishedAt?.getTime() || 0));
-      if (params?.limit) {
-        articles = articles.slice(0, params.limit);
-      }
-      return articles;
-    } catch {
-      return [];
-    }
+  // Only filter by isPublished if explicitly provided
+  if (params?.isPublished !== undefined) {
+    articles = articles.filter((a) => a.isPublished === params.isPublished);
   }
+
+  // Sort client-side by publishedAt descending
+  articles.sort((a, b) => (b.publishedAt?.getTime() || 0) - (a.publishedAt?.getTime() || 0));
+
+  // Apply limit after sorting
+  if (params?.limit) {
+    articles = articles.slice(0, params.limit);
+  }
+
+  return articles;
 }
 
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
@@ -99,7 +78,12 @@ export async function getArticleById(id: string): Promise<Article | null> {
 export async function createArticle(data: Omit<Article, "id" | "createdAt" | "updatedAt">): Promise<string> {
   if (!db) throw new Error("Firestore not configured");
   const now = Timestamp.now();
-  const docRef = await addDoc(getCollection(db), { ...data, createdAt: now, updatedAt: now });
+  const docRef = await addDoc(getCollection(db), {
+    ...data,
+    publishedAt: data.publishedAt || now,
+    createdAt: now,
+    updatedAt: now,
+  });
   return docRef.id;
 }
 
