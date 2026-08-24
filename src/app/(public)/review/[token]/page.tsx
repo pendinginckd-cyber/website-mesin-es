@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
-import { createReview, getReviewSettings } from "@/lib/firestore/reviews";
+import { createReview, markReviewLinkUsed, getReviewSettings } from "@/lib/firestore/reviews";
 import { Review } from "@/types/review";
 import { SITE_URL } from "@/lib/constants";
 import { Star, Upload, CheckCircle, AlertCircle } from "lucide-react";
@@ -86,6 +86,7 @@ export default function ReviewPage() {
       };
 
       const reviewId = await createReview(reviewData);
+      await markReviewLinkUsed(token, reviewId);
       setSubmitted(true);
     } catch (error) {
       console.error("Error submitting review:", error);
