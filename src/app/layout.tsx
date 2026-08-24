@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     locale: "id_ID",
     siteName: "Mesin Es Kristal",
   },
+  // Favicon: use PNG icons for modern browsers
   icons: {
     icon: [
       { url: "/icon.png?v=4", sizes: "32x32", type: "image/png" },
@@ -48,6 +49,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={`${inter.variable} font-sans antialiased`}>
+      <head>
+        <link rel="icon" href="/icon.png?v=5" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/icon.png?v=5" type="image/png" sizes="192x192" />
+        <link rel="icon" href="/icon.png?v=5" type="image/png" sizes="512x512" />
+        <link rel="apple-touch-icon" href="/icon.png?v=5" />
+      </head>
       <body className="min-h-screen flex flex-col bg-white text-gray-900">
         {children}
       </body>
