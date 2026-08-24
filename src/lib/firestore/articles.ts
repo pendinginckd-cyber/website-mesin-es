@@ -28,8 +28,6 @@ export async function getArticles(params?: {
 }): Promise<Article[]> {
   if (!db) return [];
 
-  const targetPublished = params?.isPublished ?? true;
-
   let q = query(getCollection(db), orderBy("publishedAt", "desc"));
   if (params?.category) q = query(q, where("category", "==", params.category));
   if (params?.limit) q = query(q, limit(params.limit));
@@ -44,8 +42,9 @@ export async function getArticles(params?: {
       updatedAt: doc.data().updatedAt?.toDate(),
     })) as Article[];
 
-    if (targetPublished) {
-      articles = articles.filter((a) => a.isPublished === true);
+    // Only filter by isPublished if explicitly provided
+    if (params?.isPublished !== undefined) {
+      articles = articles.filter((a) => a.isPublished === params.isPublished);
     }
 
     return articles;
@@ -60,8 +59,9 @@ export async function getArticles(params?: {
         updatedAt: doc.data().updatedAt?.toDate(),
       })) as Article[];
 
-      if (targetPublished) {
-        articles = articles.filter((a) => a.isPublished === true);
+      // Only filter by isPublished if explicitly provided
+      if (params?.isPublished !== undefined) {
+        articles = articles.filter((a) => a.isPublished === params.isPublished);
       }
       if (params?.category) {
         articles = articles.filter((a) => a.category === params.category);

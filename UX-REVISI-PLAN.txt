@@ -1,0 +1,274 @@
+# RANGKUMAN PLAN REVISI UX - ESKRISTALNUSANTARA.COM
+# Tanggal: 24 Agustus 2026
+# Status: Menunggu Eksekusi
+
+================================================================================
+1. FAVICON / IKON WEBSITE
+================================================================================
+Masalah: Website tidak memiliki favicon (ikon di tab browser)
+File terkait:
+  - public/favicon.ico (baru)
+  - public/icon-192.png (baru, opsional)
+  - public/icon-512.png (baru, opsional)
+  - src/app/layout.tsx (update metadata)
+Aksi:
+  - Tambahkan file favicon.ico ke folder public/
+  - Update metadata di layout.tsx dengan icons config
+Catatan: User perlu menyediakan file logo/ikon (format .png atau .ico)
+
+================================================================================
+2. TOMBOL "LIHAT PRODUK" BERKEDIP (PULSE ANIMATION)
+================================================================================
+Masalah: Tombol CTA di hero section kurang menarik perhatian
+File terkait:
+  - src/components/public/hero-section.tsx
+  - src/app/globals.css (tambah keyframes pulse-glow)
+Aksi:
+  - Tambah CSS animation @keyframes pulse-glow di globals.css
+  - Tambah class animate-pulse-glow pada tombol "Lihat Produk"
+  - Efek: subtle glow + scale yang berkedip setiap 2 detik
+  - Tidak terlalu agresif, tetap profesional
+Catatan: Hanya di hero section, bukan di semua tombol
+
+================================================================================
+3. VISITOR COUNTER (PENGUNJUNG HARIAN & TAHUNAN)
+================================================================================
+Masalah: Belum ada counter pengunjung website
+File baru:
+  - src/types/visitor-stats.ts
+  - src/lib/firestore/visitor-stats.ts
+  - src/components/public/visitor-counter.tsx
+  - src/components/public/visitor-stats-display.tsx
+  - src/app/(admin)/admin/visitor-stats/page.tsx
+File update:
+  - src/app/(public)/layout.tsx (tambah visitor-counter component)
+  - src/components/layout/footer.tsx (tampilkan counter kecil)
+  - firestore.rules (tambah rules visitorStats)
+Firestore:
+  - Collection: visitorStats (single doc, ID: "default")
+  - Fields: dailyVisitors, yearlyVisitors, totalVisitors, baseDaily, baseYearly, baseTotal, lastResetDate, lastYearReset
+Cara kerja:
+  - Setiap user buka website → increment +1 (pakai localStorage agar tidak double count per hari)
+  - Auto-reset harian: jika tanggal berubah → dailyVisitors reset ke baseDaily
+  - Auto-reset tahunan: jika tahun berubah → yearlyVisitors reset ke baseYearly
+  - totalVisitors tidak pernah reset
+Admin page:
+  - Form set nilai start (baseDaily, baseYearly, baseTotal)
+  - Tampilkan counter real-time
+  - Tombol reset manual (opsional)
+Tampilan publik:
+  - Footer: "1.250 pengunjung hari ini" (kecil, subtle)
+  - Bisa ditambah section di homepage nanti
+
+================================================================================
+4. WHATSAPP "NEGO HARGA" + LINK PRODUK
+================================================================================
+Masalah: Tombol Nego Harga tidak menyertakan link produk
+File update:
+  - src/components/public/produk-card.tsx
+  - src/components/public/product-cta.tsx (baru)
+  - src/app/(public)/produk/[slug]/page.tsx
+Perubahan:
+  - produk-card.tsx: tambah "use client", pakai useContact(), update pesan WA
+  - product-cta.tsx: Client Component baru untuk CTA di detail produk
+  - produk/[slug]/page.tsx: ganti hardcoded WA URL dengan ProductCta component
+Format pesan WhatsApp:
+  "Halo, saya tertarik dengan {nama produk} - {harga}
+
+  https://eskristalnusantara.com/produk/{slug}"
+Nomor WhatsApp:
+  - Gunakan useContact() agar otomatis ikut nomor dari admin
+  - Tidak lagi hardcoded ke constants.ts
+
+================================================================================
+5. BACK TO TOP BUTTON
+================================================================================
+Masalah: Tidak ada cara cepat kembali ke atas setelah scroll jauh
+File baru:
+  - src/components/public/back-to-top.tsx
+File update:
+  - src/app/(public)/layout.tsx (tambah component)
+Aksi:
+  - Tombol panah ke atas muncul setelah scroll 500px
+  - Fade-in animation saat muncul
+  - Smooth scroll ke atas saat diklik
+  - Posisi: fixed bottom-right, di atas floating WhatsApp
+
+================================================================================
+6. SCROLL ANIMATIONS (FADE-IN SAAT SCROLL)
+================================================================================
+Masalah: Halaman terasa statis, tidak ada animasi saat scroll
+File baru:
+  - src/components/shared/scroll-reveal.tsx
+File update:
+  - src/components/public/hero-section.tsx
+  - src/components/public/keunggulan-section.tsx
+  - src/components/public/testimoni-section.tsx
+  - src/components/public/faq-section.tsx
+  - src/components/public/cta-section.tsx
+  - src/components/public/banner-carousel.tsx
+Aksi:
+  - Buat wrapper component ScrollReveal
+  - Gunakan IntersectionObserver untuk detect elemen masuk viewport
+  - Animasi: fade-in + slide-up saat elemen muncul
+  - Tidak mengganggu performa (lazy, hanya trigger sekali)
+  - Bisa disabled untuk user yang prefers-reduced-motion
+
+================================================================================
+7. BETTER 404 PAGE
+================================================================================
+Masalah: Halaman not-found masih default Next.js
+File update:
+  - src/app/not-found.tsx
+Aksi:
+  - Desain halaman 404 yang lebih informatif
+  - Pesan: "Halaman yang Anda cari tidak ditemukan"
+  - Link kembali ke Beranda dan Produk
+  - Ilustrasi/icon yang relevan
+  - Tetap konsisten dengan design system
+
+================================================================================
+8. LOADING SKELETON IMPROVEMENTS
+================================================================================
+Masalah: Loading state masih spinner sederhana
+File update:
+  - src/components/ui/skeleton.tsx (perbaiki styling)
+  - src/app/(public)/page.tsx (tambah skeleton sections)
+  - src/app/(public)/produk/page.tsx (tambah skeleton grid)
+  - src/app/(public)/artikel/page.tsx (tambah skeleton grid)
+Aksi:
+  - Buat skeleton yang menyerupai layout asli (card shape, text lines)
+  - Animasi shimmer/gradient pada skeleton
+  - Lebih profesional daripada spinner
+
+================================================================================
+9. HOVER EFFECTS IMPROVEMENT
+================================================================================
+Masalah: Card hover masih basic
+File update:
+  - src/app/globals.css (tambah utility classes)
+  - src/components/public/produk-card.tsx
+  - src/components/public/artikel-card.tsx
+  - src/components/public/video-card.tsx
+  - src/components/public/testimoni-section.tsx
+Aksi:
+  - Card hover: lift (translateY -4px) + shadow increase
+  - Image hover: subtle zoom (scale 1.05)
+  - Link hover: color transition + underline
+  - Button hover: background color transition
+  - Semua transition smooth (duration-200/300)
+
+================================================================================
+10. FOCUS STATES (ACCESSIBILITY)
+================================================================================
+Masalah: Keyboard navigation tidak jelas
+File update:
+  - src/app/globals.css (tambah focus-visible styles)
+Aksi:
+  - Tambah focus-visible ring pada semua interactive elements
+  - Warna: primary dengan outline 2px
+  - Hanya muncul saat keyboard navigation (bukan mouse click)
+  - Meningkatkan accessibility untuk screen reader users
+
+================================================================================
+11. TAP EFFECT DI MOBILE
+================================================================================
+Masalah: Tidak ada feedback visual saat user tap elemen di mobile
+File update:
+  - src/app/globals.css (tambah utility class .tap-effect)
+  - Semua komponen interaktif (buttons, links, cards, filters, accordion, dll)
+Aksi:
+  - Tambah CSS class .tap-effect dengan :active pseudo-class
+  - Efek: scale(0.97) + opacity(0.85) saat tap
+  - Hanya aktif di mobile: @media (hover: none) and (pointer: coarse)
+  - Tidak mengganggu hover effect di desktop
+  - Apply ke:
+    * Semua tombol (Button component)
+    * Link navigasi (navbar, footer, breadcrumbs)
+    * Card produk, artikel, video, testimoni
+    * Filter buttons (pill buttons)
+    * Accordion items (FAQ)
+    * Gallery thumbnails
+    * Admin sidebar items
+    * Toggle switches
+Catatan: Efek seperti ripple/press di aplikasi native, meningkatkan UX mobile
+
+================================================================================
+12. WINDOWS DESKTOP UX
+================================================================================
+Masalah: UX desktop Windows belum dioptimalkan
+File update:
+  - src/app/globals.css (tambah custom scrollbar, text selection, print styles)
+  - src/components/shared/copy-link.tsx (baru)
+  - src/app/(public)/produk/[slug]/page.tsx (tambah copy link button)
+Aksi:
+  - Custom Scrollbar:
+    * Ganti scrollbar Windows default yang jelek
+    * Warna: primary dengan track abu-abu
+    * Width: 8px, rounded corners
+  - Text Selection Color:
+    * Warna highlight teks saat select (Ctrl+A) sesuai brand
+    * Background: primary/20, Text: primary-dark
+  - Print Styles:
+    * Halaman produk bisa di-print rapi (untuk katalog offline)
+    * Hide: navbar, footer, CTA buttons, floating WhatsApp
+    * Show: nama produk, harga, specs, gambar
+  - Copy Link Produk:
+    * Tombol "Copy Link" di halaman detail produk
+    * Copy URL ke clipboard dengan feedback "Link disalin!"
+    * Berguna untuk share ke WhatsApp/Email tanpa buka tab baru
+  - Tooltip on Hover:
+    * Tooltip muncul saat hover icon/button (desktop only)
+    * Contoh: icon WhatsApp → tooltip "Chat via WhatsApp"
+
+================================================================================
+13. LOADING TAB INDICATOR
+================================================================================
+Masalah: Tidak ada indikator loading di browser tab
+File update:
+  - src/app/(public)/layout.tsx
+  - src/app/(admin)/layout.tsx
+Aksi:
+  - Update document.title saat loading → "Loading..."
+  - Setelah selesai → "Nama Halaman | Es Kristal Nusantara"
+  - Gunakan useEffect + useRouter events (atau navigation API)
+  - Browser otomatis show spinner di tab saat navigasi
+  - Title update memberikan feedback tambahan
+
+================================================================================
+PRIORITAS EKSEKUSI (Disarankan)
+================================================================================
+Urutan 1-3 adalah yang paling penting dan berdampak langsung:
+
+  1. WhatsApp Nego Harga + Link Produk  (HIGH - langsung berdampak ke sales)
+  2. Favicon                            (MEDIUM - branding)
+  3. Tombol Berkedip                    (MEDIUM - engagement)
+  4. Visitor Counter                    (MEDIUM - analytics)
+  5. Tap Effect Mobile                  (MEDIUM - UX polish)
+  6. Windows Desktop UX                 (MEDIUM - desktop polish)
+  7. Loading Tab Indicator              (MEDIUM - feedback)
+  8. Back to Top                        (LOW - UX polish)
+  9. Scroll Animations                  (LOW - visual appeal)
+  10. Better 404 Page                   (LOW - edge case)
+  11. Loading Skeleton                  (LOW - polish)
+  12. Hover Effects                     (LOW - polish)
+  13. Focus States                      (LOW - accessibility)
+
+================================================================================
+CATATAN PENTING
+================================================================================
+- Semua perubahan bisa dilakukan tanpa downtime
+- Setiap push ke GitHub → Vercel auto-deploy (~1-2 menit)
+- Tidak ada perubahan Firestore schema yang merusak (hanya tambah collection baru)
+- Visitor counter memerlukan collection baru: visitorStats
+- WhatsApp link produk tidak memerlukan perubahan database
+- Semua client components sudah pakai ContactProvider (nomor WA dinamis)
+- Favicon perlu file dari user (logo/ikon)
+- Custom scrollbar & text selection hanya CSS, tidak perlu JS
+- Print styles menggunakan @media print
+- Copy link menggunakan navigator.clipboard API (HTTPS required)
+- Loading tab indicator menggunakan next/navigation events
+
+================================================================================
+STATUS: READY FOR EXECUTION
+================================================================================
