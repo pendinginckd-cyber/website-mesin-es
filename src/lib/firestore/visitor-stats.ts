@@ -123,7 +123,29 @@ export async function updateVisitorBase(data: {
   if (!db) throw new Error("Firestore not configured");
 
   const docRef = doc(db, "visitorStats", VISITOR_STATS_DOC_ID);
-  await setDoc(docRef, { ...data, updatedAt: Timestamp.now() }, { merge: true });
+  const currentStats = await getVisitorStats();
+  const updates: Record<string, number | string> = {};
+
+  if (data.baseDaily !== undefined) {
+    const diff = data.baseDaily - currentStats.baseDaily;
+    updates.dailyVisitors = currentStats.dailyVisitors + diff;
+    updates.baseDaily = data.baseDaily;
+  }
+
+  if (data.baseYearly !== undefined) {
+    const diff = data.baseYearly - currentStats.baseYearly;
+    updates.yearlyVisitors = currentStats.yearlyVisitors + diff;
+    updates.baseYearly = data.baseYearly;
+  }
+
+  if (data.baseTotal !== undefined) {
+    const diff = data.baseTotal - currentStats.baseTotal;
+    updates.totalVisitors = currentStats.totalVisitors + diff;
+    updates.baseTotal = data.baseTotal;
+  }
+
+  updates.updatedAt = Timestamp.now() as unknown as number;
+  await setDoc(docRef, updates, { merge: true });
 }
 
 function getDefaultVisitorStats(): VisitorStats {

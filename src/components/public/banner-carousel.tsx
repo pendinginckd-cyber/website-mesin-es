@@ -15,6 +15,7 @@ export function BannerCarousel() {
     async function fetchData() {
       try {
         const data = await getActiveBanners();
+        console.log("BannerCarousel: Fetched banners count:", data.length);
         const now = new Date();
         const active = data.filter((b) => {
           const start = b.startDate ? new Date(b.startDate) : null;
@@ -23,6 +24,7 @@ export function BannerCarousel() {
           if (end && now > end) return false;
           return true;
         });
+        console.log("BannerCarousel: Active banners after date filter:", active.length);
         setBanners(active);
       } catch (error) {
         console.error("Error fetching banners:", error);
