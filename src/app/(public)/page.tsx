@@ -5,6 +5,7 @@ import { BannerCarousel } from "@/components/public/banner-carousel";
 import { KeunggulanSection } from "@/components/public/keunggulan-section";
 import { ProdukGrid } from "@/components/public/produk-grid";
 import { TestimoniSection } from "@/components/public/testimoni-section";
+import { ReviewSection } from "@/components/public/review-section";
 import { FaqSection } from "@/components/public/faq-section";
 import { CTASection } from "@/components/public/cta-section";
 import { FloatingWhatsApp } from "@/components/public/floating-whatsapp";
@@ -61,6 +62,9 @@ export default function HomePage() {
       </ScrollReveal>
       <ScrollReveal>
         <TestimoniSection />
+      </ScrollReveal>
+      <ScrollReveal>
+        <ReviewSection title="Ulasan Terverifikasi" limit={4} />
       </ScrollReveal>
       <ScrollReveal>
         <VisitorStatsDisplay variant="section" />

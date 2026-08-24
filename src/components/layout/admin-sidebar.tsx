@@ -32,6 +32,7 @@ const navItems = [
   { href: "/admin/tentang", icon: Building2, label: "Tentang" },
   { href: "/admin/keunggulan", icon: Truck, label: "Keunggulan" },
   { href: "/admin/visitor-stats", icon: Eye, label: "Visitor Stats" },
+  { href: "/admin/reviews", icon: MessageSquare, label: "Reviews" },
   { href: "/admin/kontak", icon: Phone, label: "Kontak" },
 ];
 

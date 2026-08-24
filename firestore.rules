@@ -97,6 +97,24 @@ service cloud.firestore {
       allow write: if isAdmin() || request.auth == null; // Allow anonymous writes for visitor count
     }
 
+    // Reviews: read publik (jika approved), write admin + anonymous (untuk customer submission)
+    match /reviews/{reviewId} {
+      allow read: if resource.data.status == "approved" || isAdmin();
+      allow create: if true; // Allow anonymous customer submission
+      allow update, delete: if isAdmin();
+    }
+
+    // ReviewSettings: read publik, write admin
+    match /reviewSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ReviewLinks: read/write admin only
+    match /reviewLinks/{linkId} {
+      allow read, write: if isAdmin();
+    }
+
     // Admins: read/write hanya admin yang bersangkutan
     match /admins/{adminId} {
       allow read: if request.auth != null && request.auth.uid == adminId;
