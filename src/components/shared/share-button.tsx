@@ -119,7 +119,7 @@ export function ShareButton({ title, text, message, imageUrl, url, className = "
   const channels = [
     {
       label: "WhatsApp",
-      href: `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`,
+      href: `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`,
       icon: <MessageCircle className="w-4 h-4 text-green-600" />,
       chip: "bg-green-100",
     },
