@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { getActiveBanners } from "@/lib/firestore/banners";
 import { Banner } from "@/types/banner";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -62,21 +63,29 @@ export function BannerCarousel() {
             }`}
           >
             {banner.linkUrl ? (
-              <Link href={banner.linkUrl} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                <img
+              <Link href={banner.linkUrl} target="_blank" rel="noopener noreferrer" className="block w-full h-full relative">
+                <Image
                   src={banner.imageUrl}
                   alt={banner.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  priority={index === 0}
                   loading={index === 0 ? "eager" : "lazy"}
                 />
               </Link>
             ) : (
-              <img
-                src={banner.imageUrl}
-                alt={banner.title}
-                className="w-full h-full object-cover"
-                loading={index === 0 ? "eager" : "lazy"}
-              />
+              <div className="relative w-full h-full">
+                <Image
+                  src={banner.imageUrl}
+                  alt={banner.title}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  priority={index === 0}
+                  loading={index === 0 ? "eager" : "lazy"}
+                />
+              </div>
             )}
           </div>
         ))}

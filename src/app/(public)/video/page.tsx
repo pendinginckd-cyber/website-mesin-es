@@ -2,12 +2,15 @@ import Link from "next/link";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { VideoCard } from "@/components/public/video-card";
 import { getVideos, getFeaturedVideos } from "@/lib/firestore/videos";
-import { SITE_NAME } from "@/lib/constants";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: `Video Gallery | ${SITE_NAME}`,
   description: "Lihat langsung bagaimana mesin es kristal kami beroperasi, testimoni pelanggan, dan proses pengiriman.",
+  alternates: {
+    canonical: `${SITE_URL}/video`,
+  },
 };
 
 export default async function VideoPage() {

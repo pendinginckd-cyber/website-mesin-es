@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
 
@@ -70,10 +71,13 @@ export function ProductGallery({ thumbnail, images, videoUrl, productName }: Pro
                 className="w-full h-full"
                 aria-label="Lihat gambar besar"
               >
-                <img
+                <Image
                   src={mainImage}
                   alt={productName}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
                 />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <ZoomIn className="w-8 h-8 text-white/70 drop-shadow-lg" />
@@ -152,14 +156,17 @@ export function ProductGallery({ thumbnail, images, videoUrl, productName }: Pro
               key={idx}
               type="button"
               onClick={() => setMainImage(img)}
-              className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border-2 transition-colors ${
+              className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border-2 transition-colors relative ${
                 mainImage === img ? "border-primary" : "border-transparent hover:border-gray-300"
               }`}
             >
-              <img
+              <Image
                 src={img}
                 alt={`${productName} - Gambar ${idx + 1}`}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="64px"
+                loading="lazy"
               />
             </button>
           ))}

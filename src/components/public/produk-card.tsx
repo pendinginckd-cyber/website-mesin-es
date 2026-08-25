@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { Card, CardImage, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,10 +41,13 @@ export function ProdukCard({ product }: ProdukCardProps) {
         className="block relative overflow-hidden aspect-[4/3] tap-effect"
         aria-label={`Lihat detail ${product.name}`}
       >
-        <CardImage
+        <Image
           src={product.thumbnail}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          loading="lazy"
         />
       </Link>
 

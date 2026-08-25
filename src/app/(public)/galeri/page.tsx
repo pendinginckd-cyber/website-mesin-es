@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
 import { getGalleries } from "@/lib/firestore/galleries";
@@ -103,10 +104,12 @@ export default function GaleriPage() {
               onClick={() => setLightboxIndex(index)}
               className="group relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-gray-100 text-left"
             >
-              <img
+              <Image
                 src={item.imageUrl}
                 alt={item.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                sizes="(max-width: 768px) 50vw, 33vw"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">

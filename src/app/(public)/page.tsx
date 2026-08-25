@@ -1,5 +1,3 @@
-"use client";
-
 import { HeroSection } from "@/components/public/hero-section";
 import { BannerCarousel } from "@/components/public/banner-carousel";
 import { KeunggulanSection } from "@/components/public/keunggulan-section";
@@ -10,35 +8,38 @@ import { CTASection } from "@/components/public/cta-section";
 import { FloatingWhatsApp } from "@/components/public/floating-whatsapp";
 import { VisitorStatsDisplay } from "@/components/public/visitor-stats-display";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
-import { useState, useEffect } from "react";
 import { getFeaturedProducts, getProducts } from "@/lib/firestore/products";
-import { Product } from "@/types/product";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import type { Metadata } from "next";
 
-export default function HomePage() {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+export const metadata: Metadata = {
+  title: "Mesin Es Kristal Berkualitas | Garansi Resmi & Hemat Listrik",
+  description:
+    "Jual mesin es kristal kapasitas 1-10 ton/hari. Garansi resmi, suku cadang lengkap, teknisi siap datang. Konsultasi gratis!",
+  keywords: [
+    "jual mesin es kristal",
+    "harga mesin es kristal",
+    "mesin es batu kristal",
+    "mesin es kristal murah",
+  ],
+  openGraph: {
+    title: "Mesin Es Kristal Berkualitas | Garansi Resmi & Hemat Listrik",
+    description:
+      "Jual mesin es kristal kapasitas 1-10 ton/hari. Garansi resmi, suku cadang lengkap, teknisi siap datang.",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    type: "website",
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
+};
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        let products = await getFeaturedProducts(6);
-        if (products.length === 0) {
-          products = await getProducts({ isActive: true });
-        }
-        setFeaturedProducts(products);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        try {
-          const allProducts = await getProducts({ isActive: true });
-          setFeaturedProducts(allProducts);
-        } catch {
-          // ignore
-        }
-      }
-      setLoading(false);
-    }
-    fetchData();
-  }, []);
+export default async function HomePage() {
+  let featuredProducts = await getFeaturedProducts(6);
+  if (featuredProducts.length === 0) {
+    featuredProducts = await getProducts({ isActive: true });
+  }
 
   return (
     <>
@@ -47,15 +48,13 @@ export default function HomePage() {
       <ScrollReveal>
         <KeunggulanSection />
       </ScrollReveal>
-      {!loading && (
-        <ScrollReveal>
-          <ProdukGrid
-            products={featuredProducts}
-            title="Produk Unggulan Kami"
-            showViewAll
-          />
-        </ScrollReveal>
-      )}
+      <ScrollReveal>
+        <ProdukGrid
+          products={featuredProducts}
+          title="Produk Unggulan Kami"
+          showViewAll
+        />
+      </ScrollReveal>
       <ScrollReveal>
         <FaqSection />
       </ScrollReveal>

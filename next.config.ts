@@ -1,14 +1,24 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Allow access from network IP
   allowedDevOrigins: ['192.168.1.12', 'localhost'],
-  
-  // Turbopack config (required for Next.js 16+ with custom config)
   turbopack: {},
-  
-  // Allow static files to be served correctly
   assetPrefix: '',
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        pathname: '/v0/b/mesin-es-kristal-web.firebasestorage.app/o/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+        pathname: '/vi/**',
+      },
+    ],
+    formats: ['image/webp', 'image/avif'],
+  },
 };
 
 export default nextConfig;

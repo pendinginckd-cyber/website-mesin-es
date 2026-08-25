@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { useContact } from "@/contexts/contact-context";
 import { getAboutContent, getAboutStats, getAboutGallery } from "@/lib/firestore/about";
@@ -89,11 +90,14 @@ export default function TentangPage() {
         </h1>
 
         {content?.heroImage && (
-          <div className="aspect-video rounded-xl overflow-hidden mb-8">
-            <img
+          <div className="aspect-video rounded-xl overflow-hidden mb-8 relative">
+            <Image
               src={content.heroImage}
               alt={content.companyName || "Tentang Kami"}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 80vw"
+              priority
             />
           </div>
         )}
@@ -180,10 +184,13 @@ export default function TentangPage() {
                 onClick={() => setLightboxIndex(index)}
                 className="group relative aspect-video rounded-lg overflow-hidden border border-gray-200"
               >
-                <img
+                <Image
                   src={item.imageUrl}
                   alt={item.caption || "Galeri workshop"}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  loading="lazy"
                 />
                 {item.caption && (
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">

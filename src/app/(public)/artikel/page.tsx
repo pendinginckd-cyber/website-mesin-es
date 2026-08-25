@@ -3,6 +3,16 @@ import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ArtikelFilter } from "@/components/public/artikel-filter";
 import { ArtikelGrid } from "@/components/public/artikel-grid";
 import { getArticles } from "@/lib/firestore/articles";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: `Artikel & Tips Bisnis Es Kristal | ${SITE_NAME}`,
+  description: "Panduan lengkap seputar bisnis es kristal, perawatan mesin, dan tips meningkatkan profit.",
+  alternates: {
+    canonical: `${SITE_URL}/artikel`,
+  },
+};
 
 function ArtikelFilterWrapper({
   categories,

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Calendar, ArrowRight } from "lucide-react";
 import { Article } from "@/types/article";
 
@@ -22,12 +23,15 @@ export function ArtikelCard({ article, variant = "default" }: ArtikelCardProps) 
         href={`/artikel/${article.slug}`}
         className="group block bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
       >
-        <div className="aspect-video overflow-hidden">
+        <div className="aspect-video overflow-hidden relative">
           {article.coverImage ? (
-            <img
+            <Image
               src={article.coverImage}
               alt={article.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -52,12 +56,15 @@ export function ArtikelCard({ article, variant = "default" }: ArtikelCardProps) 
       href={`/artikel/${article.slug}`}
       className="group block bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
     >
-      <div className="aspect-video overflow-hidden">
+      <div className="aspect-video overflow-hidden relative">
         {article.coverImage ? (
-          <img
+          <Image
             src={article.coverImage}
             alt={article.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">

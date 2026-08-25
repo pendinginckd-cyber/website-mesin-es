@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /admin/login
 Disallow: /api/
 
-Sitemap: https://mesineskristal.com/sitemap.xml
+Sitemap: https://eskristalnusantara.com/sitemap.xml
