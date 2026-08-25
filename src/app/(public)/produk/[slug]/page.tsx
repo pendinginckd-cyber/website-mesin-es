@@ -8,6 +8,8 @@ import { Specification } from "@/types/product";
 import { ProductGallery } from "@/components/public/product-gallery";
 import { ProductCta } from "@/components/public/product-cta";
 import { CopyLink } from "@/components/shared/copy-link";
+import { ProductRelatedSection } from "@/components/public/product-related-section";
+import type { Metadata } from "next";
 
 const PRICE_VALID_UNTIL = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
@@ -15,7 +17,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
 
@@ -74,7 +76,7 @@ export async function generateMetadata({ params }: PageProps) {
   return {
     title,
     description,
-    canonical,
+    alternates: { canonical },
     robots: product.seoNoIndex ? "noindex, nofollow" : "index, follow",
     keywords,
     openGraph: {
@@ -371,6 +373,12 @@ export default async function ProdukDetailPage({ params }: PageProps) {
             </Card>
           </div>
         </div>
+
+        {/* Product Related Sections (Client Component for load more) */}
+        <ProductRelatedSection
+          currentSlug={product.slug}
+          category={product.category}
+        />
       </div>
     </>
   );

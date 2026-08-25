@@ -120,3 +120,48 @@ export async function getFeaturedProducts(
 ): Promise<Product[]> {
   return getProducts({ isFeatured: true, isActive: true, limit: limitCount });
 }
+
+export async function getRelatedProducts(
+  currentSlug: string,
+  category: string,
+  fetchLimit: number = 8
+): Promise<{ products: Product[]; hasMore: boolean }> {
+  if (!db) return { products: [], hasMore: false };
+
+  const sameCategory = await getProducts({ category, isActive: true });
+  let related = sameCategory.filter((p) => p.slug !== currentSlug);
+
+  const hasMore = related.length > fetchLimit;
+
+  // If less than limit, fill with products from other categories
+  if (related.length < fetchLimit) {
+    const otherProducts = await getProducts({ isActive: true });
+    const additional = otherProducts
+      .filter((p) => p.slug !== currentSlug && !related.find((r) => r.slug === p.slug))
+      .slice(0, fetchLimit - related.length);
+    related = [...related, ...additional];
+  }
+
+  return {
+    products: related.slice(0, fetchLimit),
+    hasMore: hasMore || related.length > fetchLimit,
+  };
+}
+
+export async function getOtherProducts(
+  currentSlug: string,
+  excludeCategory: string,
+  fetchLimit: number = 8
+): Promise<{ products: Product[]; hasMore: boolean }> {
+  if (!db) return { products: [], hasMore: false };
+
+  const allProducts = await getProducts({ isActive: true });
+  const other = allProducts.filter(
+    (p) => p.slug !== currentSlug && p.category !== excludeCategory
+  );
+
+  return {
+    products: other.slice(0, fetchLimit),
+    hasMore: other.length > fetchLimit,
+  };
+}
