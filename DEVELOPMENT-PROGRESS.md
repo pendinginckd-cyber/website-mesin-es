@@ -55,7 +55,6 @@
 - ✅ Responsive layout (mobile stack, desktop horizontal)
 
 **Files Created:**
-- ✅ `src/components/public/produk-filter-bar.tsx`
 - ✅ `src/components/public/produk-search-input.tsx`
 - ✅ `src/components/public/produk-category-tabs.tsx`
 - ✅ `src/components/public/produk-sort-select.tsx`
@@ -71,6 +70,44 @@
 
 **Dependencies Added:**
 - ✅ `rc-slider` (dual-handle range slider library)
+
+**Firestore Collections:** None (client-side only)
+
+---
+
+## ✅ Phase 2.5: Responsive Filter Layout (COMPLETED)
+
+**Status:** ✅ SELESAI | **Deployed:** 25 Agustus 2026
+
+**Description:** Implementasi responsive filter layout dengan mobile icons vs desktop sidebar untuk UX yang lebih baik.
+
+**Features Implemented:**
+- ✅ Search icon di navbar (posisi tengah, semua halaman)
+- ✅ Desktop filter sidebar (collapsible, muncul setelah interaksi)
+- ✅ Mobile icon bar (search, filter, menu icons)
+- ✅ Mobile search modal (full-screen)
+- ✅ Mobile filter bottom sheet (slide animation, apply button)
+- ✅ Real-time filter updates di desktop
+- ✅ Batch filter updates di mobile (terapkan filter button)
+- ✅ Filter count badge di mobile
+- ✅ Suspense boundary untuk useSearchParams
+
+**Files Created:**
+- ✅ `src/components/public/produk-filter-sidebar.tsx`
+- ✅ `src/components/public/produk-icon-bar.tsx`
+- ✅ `src/components/public/produk-search-modal.tsx`
+- ✅ `src/components/public/produk-filter-bottom-sheet.tsx`
+
+**Files Modified:**
+- ✅ `src/components/layout/navbar.tsx` (add search icon)
+- ✅ `src/app/(public)/produk/page.tsx` (new responsive layout)
+- ✅ `src/components/public/produk-category-tabs.tsx` (add onChange prop)
+- ✅ `src/components/public/produk-sort-select.tsx` (add onChange prop)
+- ✅ `src/components/public/produk-price-range.tsx` (add onChange prop)
+- ✅ `src/components/public/produk-capacity-range.tsx` (add onChange prop)
+
+**Files Deleted:**
+- ✅ `src/components/public/produk-filter-bar.tsx` (replaced by new components)
 
 **Firestore Collections:** None (client-side only)
 
