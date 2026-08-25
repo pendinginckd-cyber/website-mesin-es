@@ -119,7 +119,9 @@ export function ShareButton({ title, text, message, imageUrl, url, className = "
   const channels = [
     {
       label: "WhatsApp",
-      href: `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`,
+      // URL polos saja — pesan prafill wa.me ber-teks panjang sering
+      // tidak menghasilkan kartu preview; URL murni selalu di-render
+      href: `https://wa.me/?text=${encodeURIComponent(shareUrl)}`,
       icon: <MessageCircle className="w-4 h-4 text-green-600" />,
       chip: "bg-green-100",
     },
