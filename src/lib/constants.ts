@@ -57,3 +57,13 @@ export const STOCK_STATUSES = ["tersedia", "indent", "habis"] as const;
 export const MAX_PRODUCT_IMAGES = 8;
 export const MIN_PRODUCT_IMAGES = 3;
 export const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+
+export const SORT_OPTIONS = [
+  { value: "default", label: "Urutkan" },
+  { value: "price-asc", label: "Harga: Rendah ke Tinggi" },
+  { value: "price-desc", label: "Harga: Tinggi ke Rendah" },
+  { value: "capacity-asc", label: "Kapasitas: Kecil ke Besar" },
+  { value: "capacity-desc", label: "Kapasitas: Besar ke Kecil" },
+  { value: "name-asc", label: "Nama: A-Z" },
+  { value: "name-desc", label: "Nama: Z-A" },
+] as const;

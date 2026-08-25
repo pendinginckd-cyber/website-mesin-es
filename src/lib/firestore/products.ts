@@ -165,3 +165,69 @@ export async function getOtherProducts(
     hasMore: other.length > fetchLimit,
   };
 }
+
+export async function searchProducts(params: {
+  search?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minCapacity?: number;
+  maxCapacity?: number;
+  sortBy?: string;
+}): Promise<Product[]> {
+  if (!db) return [];
+
+  const allProducts = await getProducts({ isActive: true });
+  let filtered = allProducts;
+
+  if (params.search) {
+    const keyword = params.search.toLowerCase();
+    filtered = filtered.filter(
+      (p) =>
+        p.name.toLowerCase().includes(keyword) ||
+        p.description.toLowerCase().includes(keyword) ||
+        p.shortDescription.toLowerCase().includes(keyword)
+    );
+  }
+
+  if (params.category) {
+    filtered = filtered.filter((p) => p.category === params.category);
+  }
+
+  if (params.minPrice !== undefined) {
+    filtered = filtered.filter((p) => p.price >= params.minPrice!);
+  }
+  if (params.maxPrice !== undefined) {
+    filtered = filtered.filter((p) => p.price <= params.maxPrice!);
+  }
+
+  if (params.minCapacity !== undefined) {
+    filtered = filtered.filter((p) => p.capacityValue >= params.minCapacity!);
+  }
+  if (params.maxCapacity !== undefined) {
+    filtered = filtered.filter((p) => p.capacityValue <= params.maxCapacity!);
+  }
+
+  if (params.sortBy) {
+    filtered.sort((a, b) => {
+      switch (params.sortBy) {
+        case "price-asc":
+          return a.price - b.price;
+        case "price-desc":
+          return b.price - a.price;
+        case "capacity-asc":
+          return a.capacityValue - b.capacityValue;
+        case "capacity-desc":
+          return b.capacityValue - a.capacityValue;
+        case "name-asc":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        default:
+          return 0;
+      }
+    });
+  }
+
+  return filtered;
+}

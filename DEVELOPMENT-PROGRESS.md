@@ -5,9 +5,35 @@
 ### Project Info
 - **Start Date:** 25 Agustus 2026
 - **Target Completion:** TBD
-- **Status:** 📋 PLANNING
+- **Status:** 🚧 IN PROGRESS
 - **Total Estimasi:** ~13-17 jam kerja
 - **Tech Stack:** Next.js 16 + TypeScript + Tailwind CSS v4 + Firebase
+
+---
+
+## ✅ Bonus Feature: Produk Terkait + Produk Lainnya (COMPLETED)
+
+**Status:** ✅ SELESAI | **Deployed:** 25 Agustus 2026
+
+**Description:** Tambah section "Produk Terkait" dan "Produk Lainnya" di halaman detail produk untuk meningkatkan navigasi dan konversi.
+
+**Features Implemented:**
+- ✅ Section "Produk Terkait" (produk dengan category sama)
+- ✅ Section "Produk Lainnya" (produk dengan category berbeda)
+- ✅ Limit 8 produk per section
+- ✅ "Lihat Lebih Banyak" button dengan load more inline
+- ✅ Responsive grid: 2 kolom mobile, 3 tablet, 4 desktop
+- ✅ Server component untuk SEO + Client component untuk interactivity
+- ✅ Loading states dan error handling
+
+**Files Created:**
+- ✅ `src/components/public/product-related-section.tsx`
+
+**Files Modified:**
+- ✅ `src/lib/firestore/products.ts` (add getRelatedProducts, getOtherProducts)
+- ✅ `src/app/(public)/produk/[slug]/page.tsx` (add ProductRelatedSection)
+
+**Firestore Collections:** None (client-side only)
 
 ---
 
