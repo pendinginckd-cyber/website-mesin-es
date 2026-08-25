@@ -24,6 +24,40 @@ function ArtikelFilterWrapper({
   return <ArtikelFilter categories={categories} activeCategory={activeCategory} />;
 }
 
+function ArtikelPageContent({
+  categories,
+  activeCategory,
+  articles,
+}: {
+  categories: string[];
+  activeCategory: string;
+  articles: Awaited<ReturnType<typeof getArticles>>;
+}) {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <Breadcrumb items={[{ label: "Artikel" }]} />
+
+        <div className="text-center mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            Artikel & Tips Bisnis Es Kristal
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Panduan lengkap seputar bisnis es kristal, perawatan mesin, dan tips
+            meningkatkan profit.
+          </p>
+        </div>
+
+        <Suspense fallback={<div className="h-10 mb-8" />}>
+          <ArtikelFilterWrapper categories={categories} activeCategory={activeCategory} />
+        </Suspense>
+
+        <ArtikelGrid articles={articles} />
+      </div>
+    </div>
+  );
+}
+
 export default async function ArtikelPage({
   searchParams,
 }: {
@@ -43,27 +77,5 @@ export default async function ArtikelPage({
       ? allArticles.filter((a) => a.category === kategori)
       : allArticles;
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Breadcrumb items={[{ label: "Artikel" }]} />
-
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Artikel & Tips Bisnis Es Kristal
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Panduan lengkap seputar bisnis es kristal, perawatan mesin, dan tips
-            meningkatkan profit.
-          </p>
-        </div>
-
-        <Suspense fallback={<div className="h-10 mb-8" />}>
-          <ArtikelFilterWrapper categories={categories} activeCategory={kategori || "Semua"} />
-        </Suspense>
-
-        <ArtikelGrid articles={articles} />
-      </div>
-    </div>
-  );
+  return <ArtikelPageContent categories={categories} activeCategory={kategori || "Semua"} articles={articles} />;
 }

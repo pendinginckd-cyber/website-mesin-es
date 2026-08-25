@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ArtikelCard } from "@/components/public/artikel-card";
+import { ShareButton } from "@/components/shared/share-button";
 import { getArticleBySlug, getArticles } from "@/lib/firestore/articles";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import type { Metadata } from "next";
@@ -98,6 +99,9 @@ export default async function ArtikelDetailPage({ params }: PageProps) {
             {formattedDate && (
               <span className="text-sm text-gray-500">{formattedDate}</span>
             )}
+            <div className="ml-auto">
+              <ShareButton title={article.title} text={article.excerpt} />
+            </div>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
             {article.title}

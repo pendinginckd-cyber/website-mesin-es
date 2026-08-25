@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface ArtikelFilterProps {
   categories: string[];
@@ -9,16 +9,13 @@ interface ArtikelFilterProps {
 
 export function ArtikelFilter({ categories, activeCategory }: ArtikelFilterProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const handleCategoryChange = (category: string) => {
-    const params = new URLSearchParams(searchParams.toString());
     if (category === "Semua") {
-      params.delete("kategori");
+      router.push("/artikel");
     } else {
-      params.set("kategori", category);
+      router.push(`/artikel?kategori=${encodeURIComponent(category)}`);
     }
-    router.push(`/artikel?${params.toString()}`);
   };
 
   return (

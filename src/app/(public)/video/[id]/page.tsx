@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { VideoCard } from "@/components/public/video-card";
+import { ShareButton } from "@/components/shared/share-button";
 import { getVideoById, getVideos } from "@/lib/firestore/videos";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import type { Metadata } from "next";
@@ -90,6 +91,9 @@ export default async function VideoDetailPage({ params }: PageProps) {
             {formattedDate && (
               <span className="text-sm text-gray-500">{formattedDate}</span>
             )}
+            <div className="ml-auto">
+              <ShareButton title={video.title} text={video.description?.slice(0, 120)} />
+            </div>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">

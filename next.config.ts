@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['192.168.1.12', 'localhost'],
+  allowedDevOrigins: ['localhost', '192.168.1.12', '192.168.1.17', '192.168.1.*'],
   turbopack: {},
   assetPrefix: '',
   images: {

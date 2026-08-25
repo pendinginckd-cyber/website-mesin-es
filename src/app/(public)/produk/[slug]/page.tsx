@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Specification } from "@/types/product";
 import { ProductGallery } from "@/components/public/product-gallery";
 import { ProductCta } from "@/components/public/product-cta";
-import { CopyLink } from "@/components/shared/copy-link";
+import { ShareButton } from "@/components/shared/share-button";
 import { ProductRelatedSection } from "@/components/public/product-related-section";
 import type { Metadata } from "next";
 
@@ -234,7 +234,15 @@ export default async function ProdukDetailPage({ params }: PageProps) {
             <ProductCta product={product} />
 
             <div className="flex items-center justify-between mt-2">
-              <CopyLink />
+              <ShareButton
+                title={product.name}
+                message={[
+                  `🧊 ${product.name}`,
+                  `💰 ${product.priceDisplay}`,
+                  `✅ Garansi resmi ${product.warranty}`,
+                ].join("\n")}
+                imageUrl={product.thumbnail}
+              />
               <span className="text-xs text-gray-400">ID: {product.slug}</span>
             </div>
 
