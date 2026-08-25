@@ -15,21 +15,26 @@ const SORT_OPTIONS = [
 
 interface ProdukSortSelectProps {
   defaultValue?: string;
+  onChange?: (sort: string | undefined) => void;
 }
 
-export function ProdukSortSelect({ defaultValue }: ProdukSortSelectProps) {
+export function ProdukSortSelect({ defaultValue, onChange }: ProdukSortSelectProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   function handleSortChange(sort: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (sort === "default") {
-      params.delete("sort");
+    if (onChange) {
+      onChange(sort === "default" ? undefined : sort);
     } else {
-      params.set("sort", sort);
+      const params = new URLSearchParams(searchParams.toString());
+      if (sort === "default") {
+        params.delete("sort");
+      } else {
+        params.set("sort", sort);
+      }
+      router.push(`${pathname}?${params.toString()}`);
     }
-    router.push(`${pathname}?${params.toString()}`);
   }
 
   return (

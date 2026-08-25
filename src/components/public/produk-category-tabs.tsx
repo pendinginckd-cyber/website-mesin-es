@@ -5,21 +5,26 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 interface ProdukCategoryTabsProps {
   defaultValue?: string;
   categories: string[];
+  onChange?: (category: string | undefined) => void;
 }
 
-export function ProdukCategoryTabs({ defaultValue, categories }: ProdukCategoryTabsProps) {
+export function ProdukCategoryTabs({ defaultValue, categories, onChange }: ProdukCategoryTabsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   function handleCategoryChange(category: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (category === "all") {
-      params.delete("kategori");
+    if (onChange) {
+      onChange(category === "all" ? undefined : category);
     } else {
-      params.set("kategori", category);
+      const params = new URLSearchParams(searchParams.toString());
+      if (category === "all") {
+        params.delete("kategori");
+      } else {
+        params.set("kategori", category);
+      }
+      router.push(`${pathname}?${params.toString()}`);
     }
-    router.push(`${pathname}?${params.toString()}`);
   }
 
   if (categories.length === 0) return null;

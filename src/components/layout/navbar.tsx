@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Snowflake,
   Menu,
   X,
   Phone,
   LogIn,
+  Search,
 } from "lucide-react";
 import { useContact } from "@/contexts/contact-context";
 import { WHATSAPP_NUMBER, WHATSAPP_MESSAGE } from "@/lib/constants";
@@ -26,9 +28,19 @@ export function Navbar() {
   const { contact } = useContact();
   const [isOpen, setIsOpen] = useState(false);
   const detailsRef = useRef<HTMLDetailsElement>(null);
+  const pathname = usePathname();
+  const router = useRouter();
 
   const waNumber = contact?.whatsappNumber || WHATSAPP_NUMBER;
   const waMessage = contact?.whatsappMessage || WHATSAPP_MESSAGE;
+
+  function handleSearchClick() {
+    if (pathname === "/produk") {
+      router.push("/produk?searchModal=true");
+    } else {
+      router.push("/produk");
+    }
+  }
 
   useEffect(() => {
     const details = detailsRef.current;
@@ -70,6 +82,16 @@ export function Navbar() {
               Mesin Es Kristal
             </span>
           </Link>
+
+          {/* Search Icon (Desktop - Middle Position) */}
+          <button
+            onClick={handleSearchClick}
+            className="hidden lg:flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-gray-600 hover:text-primary max-w-xs flex-1 mx-4"
+            aria-label="Cari produk"
+          >
+            <Search className="w-4 h-4" />
+            <span className="text-sm">Cari produk...</span>
+          </button>
 
           <div className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => (

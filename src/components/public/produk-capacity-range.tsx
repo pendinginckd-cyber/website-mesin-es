@@ -10,13 +10,14 @@ interface ProdukCapacityRangeProps {
   max: number;
   currentMin?: number;
   currentMax?: number;
+  onChange?: (minCapacity: number | undefined, maxCapacity: number | undefined) => void;
 }
 
 function formatCapacity(value: number): string {
   return `${value} Ton`;
 }
 
-export function ProdukCapacityRange({ min, max, currentMin, currentMax }: ProdukCapacityRangeProps) {
+export function ProdukCapacityRange({ min, max, currentMin, currentMax, onChange }: ProdukCapacityRangeProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -25,11 +26,11 @@ export function ProdukCapacityRange({ min, max, currentMin, currentMax }: Produk
   const initialMax = currentMax && currentMax <= max ? currentMax : max;
 
   const [range, setRange] = useState<[number, number]>([initialMin, initialMax]);
-  const [debouncedRange, setDebouncedRange] = useState<[number, number]>([initialMin, initialMax]);
 
   useEffect(() => {
+    if (onChange) return;
+
     const timer = setTimeout(() => {
-      setDebouncedRange(range);
       const params = new URLSearchParams(searchParams.toString());
       if (range[0] > min) {
         params.set("minCapacity", range[0].toString());
@@ -45,7 +46,17 @@ export function ProdukCapacityRange({ min, max, currentMin, currentMax }: Produk
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [range, min, max, router, pathname, searchParams]);
+  }, [range, min, max, router, pathname, searchParams, onChange]);
+
+  const handleChange = (value: number | number[]) => {
+    const newRange = value as [number, number];
+    setRange(newRange);
+    if (onChange) {
+      const newMin = newRange[0] > min ? newRange[0] : undefined;
+      const newMax = newRange[1] < max ? newRange[1] : undefined;
+      onChange(newMin, newMax);
+    }
+  };
 
   return (
     <div className="space-y-3">
@@ -62,7 +73,7 @@ export function ProdukCapacityRange({ min, max, currentMin, currentMax }: Produk
           max={max}
           step={0.5}
           value={range}
-          onChange={(value) => setRange(value as [number, number])}
+          onChange={handleChange}
           trackStyle={[{ backgroundColor: "#0284c7", height: 6 }]}
           handleStyle={[
             { borderColor: "#0284c7", height: 18, width: 18, marginTop: -6, backgroundColor: "#fff" },

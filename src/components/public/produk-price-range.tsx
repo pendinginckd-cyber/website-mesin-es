@@ -10,6 +10,7 @@ interface ProdukPriceRangeProps {
   max: number;
   currentMin?: number;
   currentMax?: number;
+  onChange?: (minPrice: number | undefined, maxPrice: number | undefined) => void;
 }
 
 function calculatePriceStep(min: number, max: number): number {
@@ -30,7 +31,7 @@ function formatCurrency(value: number): string {
   return `Rp ${value.toLocaleString("id-ID")}`;
 }
 
-export function ProdukPriceRange({ min, max, currentMin, currentMax }: ProdukPriceRangeProps) {
+export function ProdukPriceRange({ min, max, currentMin, currentMax, onChange }: ProdukPriceRangeProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -39,11 +40,11 @@ export function ProdukPriceRange({ min, max, currentMin, currentMax }: ProdukPri
   const initialMax = currentMax && currentMax <= max ? currentMax : max;
 
   const [range, setRange] = useState<[number, number]>([initialMin, initialMax]);
-  const [debouncedRange, setDebouncedRange] = useState<[number, number]>([initialMin, initialMax]);
 
   useEffect(() => {
+    if (onChange) return;
+
     const timer = setTimeout(() => {
-      setDebouncedRange(range);
       const params = new URLSearchParams(searchParams.toString());
       if (range[0] > min) {
         params.set("minPrice", range[0].toString());
@@ -59,9 +60,19 @@ export function ProdukPriceRange({ min, max, currentMin, currentMax }: ProdukPri
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [range, min, max, router, pathname, searchParams]);
+  }, [range, min, max, router, pathname, searchParams, onChange]);
 
   const step = calculatePriceStep(min, max);
+
+  const handleChange = (value: number | number[]) => {
+    const newRange = value as [number, number];
+    setRange(newRange);
+    if (onChange) {
+      const newMin = newRange[0] > min ? newRange[0] : undefined;
+      const newMax = newRange[1] < max ? newRange[1] : undefined;
+      onChange(newMin, newMax);
+    }
+  };
 
   return (
     <div className="space-y-3">
@@ -78,7 +89,7 @@ export function ProdukPriceRange({ min, max, currentMin, currentMax }: ProdukPri
           max={max}
           step={step}
           value={range}
-          onChange={(value) => setRange(value as [number, number])}
+          onChange={handleChange}
           trackStyle={[{ backgroundColor: "#0284c7", height: 6 }]}
           handleStyle={[
             { borderColor: "#0284c7", height: 18, width: 18, marginTop: -6, backgroundColor: "#fff" },
