@@ -141,6 +141,15 @@ export async function deleteReviewLink(id: string): Promise<void> {
   await deleteDoc(doc(db, "reviewLinks", id));
 }
 
+// Kembalikan link bekas pakai menjadi dapat digunakan lagi
+export async function resetReviewLink(id: string): Promise<void> {
+  if (!db) throw new Error("Firestore not configured");
+  await updateDoc(doc(db, "reviewLinks", id), {
+    usedAt: null,
+    reviewId: null,
+  });
+}
+
 export interface ValidateLinkResult {
   valid: boolean;
   used: boolean;

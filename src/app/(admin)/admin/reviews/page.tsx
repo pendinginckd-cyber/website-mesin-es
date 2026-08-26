@@ -12,6 +12,7 @@ import {
   createReviewLink,
   getReviewLinks,
   deleteReviewLink,
+  resetReviewLink,
 } from "@/lib/firestore/reviews";
 import { Review, ReviewLink } from "@/types/review";
 import { SITE_URL } from "@/lib/constants";
@@ -28,6 +29,7 @@ import {
   Copy,
   Check,
   RefreshCw,
+  RotateCcw,
 } from "lucide-react";
 
 const STATUS_CONFIG = {
@@ -172,6 +174,17 @@ export default function ReviewsAdmin() {
     } catch (error) {
       console.error("Error deleting link:", error);
       alert("Gagal menghapus link.");
+    }
+  }
+
+  async function handleResetLink(id: string) {
+    if (!confirm("Reset tautan ini agar dapat digunakan kembali? Review lama yang sudah masuk tidak ikut terhapus.")) return;
+    try {
+      await resetReviewLink(id);
+      fetchData();
+    } catch (error) {
+      console.error("Error resetting link:", error);
+      alert("Gagal reset link.");
     }
   }
 
@@ -372,7 +385,15 @@ export default function ReviewsAdmin() {
                           <Copy className="w-4 h-4" />
                         )}
                       </button>
-                      {!isUsed && (
+                      {isUsed ? (
+                        <button
+                          onClick={() => handleResetLink(link.id)}
+                          className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                          title="Reset agar bisa dipakai lagi"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                        </button>
+                      ) : (
                         <button
                           onClick={() =>
                             openWaFor(link.customerName, link.customerPhone, `${SITE_URL}/review/${link.token}`)
