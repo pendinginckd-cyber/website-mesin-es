@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  getLeads,
+  subscribeLeads,
   updateLeadStatus,
   deleteLead,
+  getLeads,
 } from "@/lib/firestore/leads";
 import { Lead } from "@/types/lead";
-import { WHATSAPP_NUMBER, WHATSAPP_MESSAGE } from "@/lib/constants";
+import { WHATSAPP_MESSAGE } from "@/lib/constants";
 import {
   Trash2,
   MessageSquare,
@@ -20,6 +21,7 @@ import {
   Phone,
   ChevronDown,
   ChevronUp,
+  RefreshCw,
 } from "lucide-react";
 
 const STATUS_CONFIG = {
@@ -48,7 +50,18 @@ export default function LeadsAdmin() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchLeads();
+    // Realtime: lead baru/status baru muncul otomatis tanpa reload
+    const unsubscribe = subscribeLeads(
+      (data) => {
+        setLeads(data);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error subscribing leads:", error);
+        setLoading(false);
+      }
+    );
+    return () => unsubscribe();
   }, []);
 
   async function fetchLeads() {
@@ -83,10 +96,31 @@ export default function LeadsAdmin() {
     }
   }
 
-  function openWhatsApp(lead: Lead) {
-    const phone = lead.phone.replace(/[^0-9]/g, "");
+  function normalizePhone(phone: string): string {
+    const digits = phone.replace(/[^0-9]/g, "");
+    // wa.me mewajibkan format internasional tanpa awalan 0
+    if (digits.startsWith("62")) return digits;
+    if (digits.startsWith("0")) return "62" + digits.slice(1);
+    if (digits.startsWith("8")) return "62" + digits;
+    return digits;
+  }
+
+  async function openWhatsApp(lead: Lead) {
+    const phone = normalizePhone(lead.phone);
     const message = `Halo ${lead.name}, terima kasih sudah menghubungi kami. ${WHATSAPP_MESSAGE}`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
+
+    // Otomatis tandai Contacted jika masih New
+    if (lead.status === "new") {
+      try {
+        await updateLeadStatus(lead.id, "contacted");
+        setLeads((prev) =>
+          prev.map((l) => (l.id === lead.id ? { ...l, status: "contacted" as const } : l))
+        );
+      } catch (error) {
+        console.error("Error auto-updating status:", error);
+      }
+    }
   }
 
   function getFiltered() {
@@ -115,6 +149,10 @@ export default function LeadsAdmin() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Manajemen Leads</h2>
+        <Button variant="outline" size="sm" onClick={fetchLeads} disabled={loading}>
+          <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} />
+          Refresh
+        </Button>
       </div>
 
       {/* Stats */}

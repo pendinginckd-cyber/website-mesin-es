@@ -1,6 +1,6 @@
 import {
   collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc,
-  query, where, orderBy, limit, Timestamp, type Firestore,
+  query, where, orderBy, limit, Timestamp, onSnapshot, type Firestore,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { Lead } from "@/types/lead";
@@ -17,6 +17,29 @@ export async function getLeads(params?: { status?: string; limit?: number }): Pr
   if (params?.limit) q = query(q, limit(params.limit));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate() })) as Lead[];
+}
+
+export function subscribeLeads(
+  callback: (leads: Lead[]) => void,
+  onError?: (error: Error) => void
+): () => void {
+  if (!db) {
+    callback([]);
+    return () => {};
+  }
+  const q = query(getCollection(db), orderBy("createdAt", "desc"));
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+      })) as Lead[];
+      callback(data);
+    },
+    (error) => onError?.(error)
+  );
 }
 
 export async function getLeadById(id: string): Promise<Lead | null> {
