@@ -113,7 +113,9 @@ export function ShareButton({ title, text, message, imageUrl, url, className = "
     setOpen((v) => !v);
   }
 
-  const shareUrl = url || window.location.href;
+  // SSR-safe: window belum ada saat render server — fallback string kosong,
+  // nilai asli terisi ulang saat hydration di browser
+  const shareUrl = url || (typeof window !== "undefined" ? window.location.href : "");
   const shareText = message || (text ? `${title} - ${text}` : title);
 
   const channels = [
@@ -146,7 +148,7 @@ export function ShareButton({ title, text, message, imageUrl, url, className = "
   ];
 
   return (
-    <div ref={containerRef} className={`relative inline-flex ${className}`}>
+    <div ref={containerRef} className={`relative inline-flex ${className}`} suppressHydrationWarning>
       <button
         onClick={handleShareClick}
         className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors tap-effect"
