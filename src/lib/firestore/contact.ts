@@ -7,7 +7,11 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { ContactInfo } from "@/types/contact";
-import { WHATSAPP_NUMBER, WHATSAPP_MESSAGE } from "@/lib/constants";
+import {
+  WHATSAPP_NUMBER,
+  WHATSAPP_MESSAGE,
+  decodeSafe,
+} from "@/lib/constants";
 
 const CONTACT_DOC_ID = "default";
 
@@ -25,7 +29,8 @@ export async function getContactInfo(): Promise<ContactInfo> {
       return {
         id: docSnap.id,
         whatsappNumber: data.whatsappNumber || WHATSAPP_NUMBER,
-        whatsappMessage: data.whatsappMessage || WHATSAPP_MESSAGE,
+        // Nilai lama di Firestore tersimpan ter-encode (%20) — bersihkan
+        whatsappMessage: decodeSafe(data.whatsappMessage) || WHATSAPP_MESSAGE,
         email: data.email || "",
         address: data.address || "",
         operatingHours: data.operatingHours || "",

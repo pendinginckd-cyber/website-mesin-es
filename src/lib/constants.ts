@@ -2,11 +2,23 @@ export const SITE_NAME = "Mesin Es Kristal";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://mesineskristal.com";
 
+// Nilai env lama tersimpan dalam bentuk ter-encode (%20) karena pola
+// pemakaian awal menyisipkannya mentah ke URL. Dekode defensif di sini
+// agar seluruh konsumen menerima teks polos sebelum meng-encode ulang.
+export function decodeSafe(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export const WHATSAPP_NUMBER =
   process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281326440039";
-export const WHATSAPP_MESSAGE =
+export const WHATSAPP_MESSAGE = decodeSafe(
   process.env.NEXT_PUBLIC_WHATSAPP_MESSAGE ||
-  "Halo saya tertarik dengan mesin es kristal";
+    "Halo saya tertarik dengan mesin es kristal"
+);
 
 export const COLLECTIONS = {
   PRODUCTS: "products",
