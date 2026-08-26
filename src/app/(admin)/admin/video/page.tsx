@@ -82,15 +82,14 @@ export default function VideoAdmin() {
   }
 
   function handleChange(name: string, value: string | number | boolean) {
-    setFormData((prev) => {
-      const updated = { ...prev, [name]: value };
-      if (name === "youtubeUrl" && typeof value === "string") {
-        const youtubeId = extractYouTubeId(value);
-        updated.youtubeId = youtubeId;
-        setThumbnailError(false);
-      }
-      return updated;
-    });
+    if (name === "youtubeUrl" && typeof value === "string") {
+      // Efek samping di luar updater agar tetap pure (aman StrictMode)
+      setThumbnailError(false);
+      const youtubeId = extractYouTubeId(value);
+      setFormData((prev) => ({ ...prev, youtubeUrl: value, youtubeId }));
+      return;
+    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
   function openNewForm() {
@@ -383,7 +382,11 @@ export default function VideoAdmin() {
                             alt={video.title}
                             className="w-20 h-12 object-cover rounded"
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src = "https://via.placeholder.com/160x90?text=No+Thumbnail";
+                              // Fallback ke thumbnail YouTube resmi (via.placeholder.com sudah mati)
+                              const img = e.target as HTMLImageElement;
+                              if (img.dataset.fallbackApplied) return;
+                              img.dataset.fallbackApplied = "1";
+                              img.src = `https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`;
                             }}
                           />
                           <div>

@@ -43,7 +43,16 @@ export async function getKeunggulanSettings(): Promise<KeunggulanSettings> {
 export async function updateKeunggulanSettings(data: Partial<Omit<KeunggulanSettings, "id" | "updatedAt">>): Promise<void> {
   if (!db) throw new Error("Firestore not configured");
   const docRef = doc(db, "keunggulanSettings", SETTINGS_DOC_ID);
-  await setDoc(docRef, { ...data, updatedAt: Timestamp.now() }, { merge: true });
+  // Hanya field settings yang sah — key asing dari payload tidak ikut disimpan
+  await setDoc(
+    docRef,
+    {
+      title: data.title ?? "",
+      subtitle: data.subtitle ?? "",
+      updatedAt: Timestamp.now(),
+    },
+    { merge: true }
+  );
 }
 
 function getDefaultKeunggulanSettings(): KeunggulanSettings {

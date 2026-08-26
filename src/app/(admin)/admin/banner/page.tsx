@@ -94,8 +94,11 @@ export default function BannerAdmin() {
     setForm({ title: "", imageUrl: "", linkUrl: "", order: maxOrder + 1, isActive: true, startDate: formatDate(new Date()), endDate: "" });
   }
 
+  const [saving, setSaving] = useState(false);
+
   async function handleSave() {
-    if (!form.title || !form.imageUrl) return;
+    if (!form.title || !form.imageUrl || saving) return;
+    setSaving(true);
     try {
       const data: Record<string, unknown> = {
         title: form.title,
@@ -116,6 +119,8 @@ export default function BannerAdmin() {
     } catch (error) {
       console.error("Error saving banner:", error);
       alert("Gagal menyimpan.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -254,8 +259,8 @@ export default function BannerAdmin() {
                 <span className="text-sm text-gray-700">Aktif</span>
               </div>
               <div className="flex gap-3 pt-2">
-                <Button size="sm" onClick={handleSave}>
-                  <Check className="w-4 h-4 mr-1" /> Simpan
+                <Button size="sm" onClick={handleSave} disabled={saving}>
+                  <Check className="w-4 h-4 mr-1" /> {saving ? "Menyimpan..." : "Simpan"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={resetForm}>
                   <X className="w-4 h-4 mr-1" /> Batal

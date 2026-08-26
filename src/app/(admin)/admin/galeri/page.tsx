@@ -83,8 +83,11 @@ export default function GaleriAdmin() {
     setForm({ title: "", imageUrl: "", category: "workshop", description: "", order: maxOrder + 1, isActive: true });
   }
 
+  const [saving, setSaving] = useState(false);
+
   async function handleSave() {
-    if (!form.title || !form.imageUrl) return;
+    if (!form.title || !form.imageUrl || saving) return;
+    setSaving(true);
     try {
       if (editingId) {
         await updateGallery(editingId, form);
@@ -96,6 +99,8 @@ export default function GaleriAdmin() {
     } catch (error) {
       console.error("Error saving gallery:", error);
       alert("Gagal menyimpan.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -235,8 +240,8 @@ export default function GaleriAdmin() {
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <Button size="sm" onClick={handleSave}>
-                  <Check className="w-4 h-4 mr-1" /> Simpan
+                <Button size="sm" onClick={handleSave} disabled={saving}>
+                  <Check className="w-4 h-4 mr-1" /> {saving ? "Menyimpan..." : "Simpan"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={resetForm}>
                   <X className="w-4 h-4 mr-1" /> Batal

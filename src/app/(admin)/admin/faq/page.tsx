@@ -80,8 +80,11 @@ export default function FaqAdmin() {
     setForm({ question: "", answer: "", category: "umum", order: maxOrder + 1, isActive: true });
   }
 
+  const [saving, setSaving] = useState(false);
+
   async function handleSave() {
-    if (!form.question || !form.answer) return;
+    if (!form.question || !form.answer || saving) return;
+    setSaving(true);
     try {
       if (editingId) {
         await updateFaq(editingId, form);
@@ -93,6 +96,8 @@ export default function FaqAdmin() {
     } catch (error) {
       console.error("Error saving faq:", error);
       alert("Gagal menyimpan.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -224,8 +229,8 @@ export default function FaqAdmin() {
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <Button size="sm" onClick={handleSave}>
-                  <Check className="w-4 h-4 mr-1" /> Simpan
+                <Button size="sm" onClick={handleSave} disabled={saving}>
+                  <Check className="w-4 h-4 mr-1" /> {saving ? "Menyimpan..." : "Simpan"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={resetForm}>
                   <X className="w-4 h-4 mr-1" /> Batal

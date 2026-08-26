@@ -1,9 +1,7 @@
 import {
   doc,
   getDoc,
-  setDoc,
   Timestamp,
-  type Firestore,
   runTransaction,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
@@ -79,7 +77,6 @@ export async function incrementVisitorCount(): Promise<void> {
       let lastYearReset = data.lastYearReset || "";
       const baseDaily = data.baseDaily || 0;
       const baseYearly = data.baseYearly || 0;
-      const baseTotal = data.baseTotal || 0;
 
       // Reset daily if date changed
       if (lastResetDate !== todayStr) {
@@ -123,29 +120,41 @@ export async function updateVisitorBase(data: {
   if (!db) throw new Error("Firestore not configured");
 
   const docRef = doc(db, "visitorStats", VISITOR_STATS_DOC_ID);
-  const currentStats = await getVisitorStats();
-  const updates: Record<string, number | string> = {};
 
-  if (data.baseDaily !== undefined) {
-    const diff = data.baseDaily - currentStats.baseDaily;
-    updates.dailyVisitors = currentStats.dailyVisitors + diff;
-    updates.baseDaily = data.baseDaily;
-  }
+  // Transaksional agar tidak menimpa increment pengunjung yang terjadi bersamaan
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(docRef);
+    const current = snap.exists()
+      ? (snap.data() as Partial<VisitorStats>)
+      : getDefaultVisitorStats();
 
-  if (data.baseYearly !== undefined) {
-    const diff = data.baseYearly - currentStats.baseYearly;
-    updates.yearlyVisitors = currentStats.yearlyVisitors + diff;
-    updates.baseYearly = data.baseYearly;
-  }
+    const curDaily = current.dailyVisitors || 0;
+    const curYearly = current.yearlyVisitors || 0;
+    const curTotal = current.totalVisitors || 0;
 
-  if (data.baseTotal !== undefined) {
-    const diff = data.baseTotal - currentStats.baseTotal;
-    updates.totalVisitors = currentStats.totalVisitors + diff;
-    updates.baseTotal = data.baseTotal;
-  }
+    const updates: Record<string, number | string | Timestamp> = {};
 
-  updates.updatedAt = Timestamp.now() as unknown as number;
-  await setDoc(docRef, updates, { merge: true });
+    if (data.baseDaily !== undefined) {
+      const diff = data.baseDaily - (current.baseDaily || 0);
+      updates.dailyVisitors = curDaily + diff;
+      updates.baseDaily = data.baseDaily;
+    }
+
+    if (data.baseYearly !== undefined) {
+      const diff = data.baseYearly - (current.baseYearly || 0);
+      updates.yearlyVisitors = curYearly + diff;
+      updates.baseYearly = data.baseYearly;
+    }
+
+    if (data.baseTotal !== undefined) {
+      const diff = data.baseTotal - (current.baseTotal || 0);
+      updates.totalVisitors = curTotal + diff;
+      updates.baseTotal = data.baseTotal;
+    }
+
+    updates.updatedAt = Timestamp.now();
+    tx.set(docRef, updates, { merge: true });
+  });
 }
 
 function getDefaultVisitorStats(): VisitorStats {

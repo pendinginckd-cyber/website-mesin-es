@@ -5,7 +5,6 @@ import { Save, Plus, Check, X, Edit2, Trash2, ArrowUp, ArrowDown } from "lucide-
 import { Star as StarIcon, Shield as ShieldIcon, Wrench as WrenchIcon, DollarSign as DollarSignIcon, Truck as TruckIcon, Headphones as HeadphonesIcon } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
-import { ImageUploadSingle } from "@/components/ui/image-upload-single";
 import {
   getKeunggulanSettings,
   updateKeunggulanSettings,
@@ -14,7 +13,7 @@ import {
   updateKeunggulanItem,
   deleteKeunggulanItem,
 } from "@/lib/firestore/keunggulan";
-import { KeunggulanSettings, KeunggulanItem } from "@/types/keunggulan";
+import { KeunggulanItem } from "@/types/keunggulan";
 import { Button } from "@/components/ui/button";
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -30,21 +29,32 @@ const ICON_OPTIONS = [
   { value: "headphones", label: "Headphones" },
 ];
 
+interface ItemForm {
+  icon: string;
+  title: string;
+  description: string;
+  order: number;
+  isActive: boolean;
+}
+
+const EMPTY_ITEM_FORM: ItemForm = {
+  icon: "shield",
+  title: "",
+  description: "",
+  order: 0,
+  isActive: true,
+};
+
 export default function KeunggulanAdmin() {
-  const [settings, setSettings] = useState<KeunggulanSettings | null>(null);
   const [items, setItems] = useState<KeunggulanItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    subtitle: "",
-    icon: "shield",
-    description: "",
-    order: 0,
-    isActive: true,
-  });
+  const [itemSaving, setItemSaving] = useState(false);
+  // State terpisah agar form settings dan form item tidak saling mencemari
+  const [settingsForm, setSettingsForm] = useState({ title: "", subtitle: "" });
+  const [itemForm, setItemForm] = useState<ItemForm>(EMPTY_ITEM_FORM);
 
   useEffect(() => {
     fetchData();
@@ -52,34 +62,39 @@ export default function KeunggulanAdmin() {
 
   async function fetchData() {
     setLoading(true);
-    const [settingsData, itemsData] = await Promise.all([
-      getKeunggulanSettings(),
-      getKeunggulanItems(),
-    ]);
-    setSettings(settingsData);
-    setItems(itemsData.filter((i) => i.isActive));
-    setForm({
-      title: settingsData?.title || "",
-      subtitle: settingsData?.subtitle || "",
-      icon: settingsData?.icon || "shield",
-      description: "",
-      order: 0,
-      isActive: true,
-    });
-    setLoading(false);
+    try {
+      const [settingsData, itemsData] = await Promise.all([
+        getKeunggulanSettings(),
+        getKeunggulanItems(),
+      ]);
+      setItems(itemsData.filter((i) => i.isActive));
+      setSettingsForm({
+        title: settingsData?.title || "",
+        subtitle: settingsData?.subtitle || "",
+      });
+    } catch (error) {
+      console.error("Error fetching keunggulan:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function handleContentChange(name: string, value: string) {
-    setForm((prev) => ({ ...prev, [name]: value }));
+  function resetItemForm() {
+    setItemForm(EMPTY_ITEM_FORM);
   }
 
   async function handleSettingsSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (saving) return;
     setSaving(true);
     try {
-      await updateKeunggulanSettings(form);
+      // Kirim HANYA field settings — jangan ikutkan key milik item
+      await updateKeunggulanSettings({
+        title: settingsForm.title,
+        subtitle: settingsForm.subtitle,
+      });
       alert("Setting keunggulan berhasil diupdate!");
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Error saving settings:", error);
       alert("Gagal menyimpan setting. Silakan coba lagi.");
@@ -88,40 +103,51 @@ export default function KeunggulanAdmin() {
   }
 
   async function handleAddItem() {
-    if (!form.title || !form.description) return;
+    if (!itemForm.title.trim() || !itemForm.description.trim() || itemSaving) return;
+    setItemSaving(true);
     try {
       const maxOrder = items.length > 0 ? Math.max(...items.map((i) => i.order)) : 0;
       await createKeunggulanItem({
-        ...form,
+        icon: itemForm.icon,
+        title: itemForm.title.trim(),
+        description: itemForm.description.trim(),
         order: maxOrder + 1,
         isActive: true,
       });
-      setForm({ title: "", subtitle: "", icon: "shield", description: "", order: 0, isActive: true });
-      fetchData();
+      resetItemForm();
+      setAdding(false);
+      await fetchData();
     } catch (error) {
       console.error("Error creating item:", error);
       alert("Gagal menambahkan item.");
     }
+    setItemSaving(false);
   }
 
   async function handleUpdateItem(id: string) {
-    if (!form.title || !form.description) return;
+    if (!itemForm.title.trim() || !itemForm.description.trim() || itemSaving) return;
+    setItemSaving(true);
     try {
-      await updateKeunggulanItem(id, form);
+      await updateKeunggulanItem(id, {
+        icon: itemForm.icon,
+        title: itemForm.title.trim(),
+        description: itemForm.description.trim(),
+      });
       setEditingId(null);
-      setForm({ title: "", subtitle: "", icon: "shield", description: "", order: 0, isActive: true });
-      fetchData();
+      resetItemForm();
+      await fetchData();
     } catch (error) {
       console.error("Error updating item:", error);
       alert("Gagal mengupdate item.");
     }
+    setItemSaving(false);
   }
 
   async function handleDeleteItem(id: string) {
     if (!confirm("Hapus item keunggulan ini?")) return;
     try {
       await deleteKeunggulanItem(id);
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Error deleting item:", error);
       alert("Gagal menghapus item.");
@@ -140,7 +166,7 @@ export default function KeunggulanAdmin() {
         updateKeunggulanItem(item.id, { order: other.order }),
         updateKeunggulanItem(other.id, { order: item.order }),
       ]);
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Error moving item:", error);
     }
@@ -173,8 +199,8 @@ export default function KeunggulanAdmin() {
               <Label>Judul Section</Label>
               <input
                 type="text"
-                value={form.title}
-                onChange={(e) => handleContentChange("title", e.target.value)}
+                value={settingsForm.title}
+                onChange={(e) => setSettingsForm((prev) => ({ ...prev, title: e.target.value }))}
                 placeholder="Kenapa Pilih Mesin Es Kristal Kami?"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
               />
@@ -183,8 +209,8 @@ export default function KeunggulanAdmin() {
             <div>
               <Label>Subtitle</Label>
               <textarea
-                value={form.subtitle}
-                onChange={(e) => handleContentChange("subtitle", e.target.value)}
+                value={settingsForm.subtitle}
+                onChange={(e) => setSettingsForm((prev) => ({ ...prev, subtitle: e.target.value }))}
                 rows={3}
                 placeholder="Kami memberikan yang terbaik untuk setiap pelanggan dengan kualitas produk dan layanan purna jual yang terjamin."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
@@ -210,7 +236,7 @@ export default function KeunggulanAdmin() {
               Item Keunggulan
             </h3>
             {!adding && editingId === null && (
-              <Button variant="outline" size="sm" onClick={() => { setAdding(true); setForm({ title: "", subtitle: "", icon: "shield", description: "", order: 0, isActive: true }); }}>
+              <Button variant="outline" size="sm" onClick={() => { setAdding(true); resetItemForm(); }}>
                 <Plus className="w-4 h-4 mr-1" /> Tambah
               </Button>
             )}
@@ -222,8 +248,8 @@ export default function KeunggulanAdmin() {
                 <div>
                   <Label>Icon</Label>
                   <select
-                    value={form.icon}
-                    onChange={(e) => setForm((prev) => ({ ...prev, icon: e.target.value }))}
+                    value={itemForm.icon}
+                    onChange={(e) => setItemForm((prev) => ({ ...prev, icon: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
                   >
                     {ICON_OPTIONS.map((opt) => (
@@ -235,8 +261,8 @@ export default function KeunggulanAdmin() {
                   <Label>Judul</Label>
                   <input
                     type="text"
-                    value={form.title}
-                    onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+                    value={itemForm.title}
+                    onChange={(e) => setItemForm((prev) => ({ ...prev, title: e.target.value }))}
                     placeholder="Kapasitas Riil"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
                   />
@@ -244,8 +270,8 @@ export default function KeunggulanAdmin() {
                 <div>
                   <Label>Deskripsi</Label>
                   <textarea
-                    value={form.description}
-                    onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+                    value={itemForm.description}
+                    onChange={(e) => setItemForm((prev) => ({ ...prev, description: e.target.value }))}
                     rows={2}
                     placeholder="Kapasitas produksi sesuai spesifikasi..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
@@ -253,10 +279,10 @@ export default function KeunggulanAdmin() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleAddItem}>
-                  <Check className="w-4 h-4 mr-1" /> Simpan
+                <Button size="sm" onClick={handleAddItem} disabled={itemSaving}>
+                  <Check className="w-4 h-4 mr-1" /> {itemSaving ? "Menyimpan..." : "Simpan"}
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => { setAdding(false); setForm({ title: "", subtitle: "", icon: "shield", description: "", order: 0, isActive: true }); }}>
+                <Button size="sm" variant="outline" onClick={() => { setAdding(false); resetItemForm(); }}>
                   <X className="w-4 h-4 mr-1" /> Batal
                 </Button>
               </div>
@@ -271,27 +297,24 @@ export default function KeunggulanAdmin() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <input
                         type="text"
-                        value={form.title}
-                        onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+                        value={itemForm.title}
+                        onChange={(e) => setItemForm((prev) => ({ ...prev, title: e.target.value }))}
                         className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
                       />
                       <input
                         type="text"
-                        value={form.description}
-                        onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+                        value={itemForm.description}
+                        onChange={(e) => setItemForm((prev) => ({ ...prev, description: e.target.value }))}
                         className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
                       />
                       <select
-                        value={form.icon}
-                        onChange={(e) => setForm((prev) => ({ ...prev, icon: e.target.value }))}
+                        value={itemForm.icon}
+                        onChange={(e) => setItemForm((prev) => ({ ...prev, icon: e.target.value }))}
                         className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
                       >
-                        <option value="star">Star</option>
-                        <option value="shield">Shield</option>
-                        <option value="wrench">Wrench</option>
-                        <option value="dollar-sign">Dollar Sign</option>
-                        <option value="truck">Truck</option>
-                        <option value="headphones">Headphones</option>
+                        {ICON_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
                       </select>
                     </div>
                   ) : (
@@ -306,19 +329,19 @@ export default function KeunggulanAdmin() {
                     </div>
                   )}
 
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 mt-2">
                     {editingId === item.id ? (
                       <>
-                        <Button size="sm" onClick={() => handleUpdateItem(item.id)}>
+                        <Button size="sm" onClick={() => handleUpdateItem(item.id)} disabled={itemSaving}>
                           <Check className="w-4 h-4" />
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => { setEditingId(null); setForm({ title: "", subtitle: "", icon: "shield", description: "", order: 0, isActive: true }); }}>
+                        <Button size="sm" variant="outline" onClick={() => { setEditingId(null); resetItemForm(); }}>
                           <X className="w-4 h-4" />
                         </Button>
                       </>
                     ) : (
                       <>
-                        <Button size="sm" variant="outline" onClick={() => { setEditingId(item.id); setForm({ title: item.title, subtitle: item.subtitle ?? "", icon: item.icon, description: item.description, order: item.order, isActive: item.isActive }); }}>
+                        <Button size="sm" variant="outline" onClick={() => { setEditingId(item.id); setAdding(false); setItemForm({ icon: item.icon, title: item.title, description: item.description, order: item.order, isActive: item.isActive }); }}>
                           <Edit2 className="w-4 h-4" />
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => handleDeleteItem(item.id)}>
@@ -348,7 +371,7 @@ export default function KeunggulanAdmin() {
             ))}
 
             {items.length === 0 && !adding && (
-              <p className="text-sm text-gray-500 text-center py-4">Belum ada item keunggulan. Klik "Tambah" untuk menambahkan.</p>
+              <p className="text-sm text-gray-500 text-center py-4">Belum ada item keunggulan. Klik &quot;Tambah&quot; untuk menambahkan.</p>
             )}
           </div>
         </div>

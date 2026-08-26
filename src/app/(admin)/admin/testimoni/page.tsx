@@ -122,8 +122,11 @@ export default function TestimoniAdmin() {
     setForm({ customerName: "", customerTitle: "", location: "", content: "", rating: 5, photo: "", videoUrl: "", productUsed: "", isActive: true, isFeatured: false });
   }
 
+  const [saving, setSaving] = useState(false);
+
   async function handleSave() {
-    if (!form.customerName || !form.content) return;
+    if (!form.customerName || !form.content || saving) return;
+    setSaving(true);
     try {
       const data: Record<string, unknown> = {
         customerName: form.customerName,
@@ -150,6 +153,8 @@ export default function TestimoniAdmin() {
     } catch (error) {
       console.error("Error saving testimonial:", error);
       alert("Gagal menyimpan.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -328,8 +333,8 @@ export default function TestimoniAdmin() {
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <Button size="sm" onClick={handleSave}>
-                  <Check className="w-4 h-4 mr-1" /> Simpan
+                <Button size="sm" onClick={handleSave} disabled={saving}>
+                  <Check className="w-4 h-4 mr-1" /> {saving ? "Menyimpan..." : "Simpan"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={resetForm}>
                   <X className="w-4 h-4 mr-1" /> Batal

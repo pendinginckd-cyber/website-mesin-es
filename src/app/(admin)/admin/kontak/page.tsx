@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Phone, Mail, MapPin, Clock, MessageSquare, Save } from "lucide-react";
 import { getContactInfo, updateContactInfo } from "@/lib/firestore/contact";
 import { ContactInfo } from "@/types/contact";
+import { normalizeWaPhone } from "@/lib/phone";
 
 function Label({ children }: { children: React.ReactNode }) {
   return <label className="block text-sm font-medium text-gray-700 mb-1">{children}</label>;
@@ -69,6 +70,8 @@ export default function KontakAdmin() {
     try {
       const cleanedData = {
         ...formData,
+        // wa.me menolak nomor lokal/ber-prefiks — simpan selalu format internasional
+        whatsappNumber: normalizeWaPhone(formData.whatsappNumber),
         googleMapsEmbed: extractMapsUrl(formData.googleMapsEmbed),
       };
       await updateContactInfo(cleanedData);
@@ -199,7 +202,7 @@ export default function KontakAdmin() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Buka Google Maps → Cari lokasi → Klik Share → Pilih "Embed a map" → Copy URL dari <code className="bg-gray-100 px-1 rounded">src="..."</code>
+                    Buka Google Maps → Cari lokasi → Klik Share → Pilih &quot;Embed a map&quot; → Copy URL dari <code className="bg-gray-100 px-1 rounded">src=&quot;...&quot;</code>
                   </p>
                   {formData.googleMapsEmbed && formData.googleMapsEmbed.startsWith("https://www.google.com/maps/embed?") ? (
                     <div className="mt-3 aspect-video rounded-lg overflow-hidden border border-gray-200">

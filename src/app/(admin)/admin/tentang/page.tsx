@@ -16,7 +16,7 @@ import {
   updateAboutGalleryItem,
   deleteAboutGalleryItem,
 } from "@/lib/firestore/about";
-import { AboutContent, AboutStat, AboutGalleryItem } from "@/types/about";
+import { AboutStat, AboutGalleryItem } from "@/types/about";
 import {
   Save,
   Plus,
@@ -30,6 +30,7 @@ import {
   Star,
   FileText,
   Target,
+  Power,
 } from "lucide-react";
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -37,11 +38,12 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 export default function TentangAdmin() {
-  const [content, setContent] = useState<AboutContent | null>(null);
   const [stats, setStats] = useState<AboutStat[]>([]);
   const [gallery, setGallery] = useState<AboutGalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [statSaving, setStatSaving] = useState(false);
+  const [gallerySaving, setGallerySaving] = useState(false);
   const [formData, setFormData] = useState({
     heroImage: "",
     companyName: "",
@@ -62,22 +64,27 @@ export default function TentangAdmin() {
 
   async function fetchData() {
     setLoading(true);
-    const [contentData, statsData, galleryData] = await Promise.all([
-      getAboutContent(),
-      getAboutStats(),
-      getAboutGallery(),
-    ]);
-    setContent(contentData);
-    setStats(statsData.filter((s) => s.isActive));
-    setGallery(galleryData.filter((g) => g.isActive));
-    setFormData({
-      heroImage: contentData.heroImage || "",
-      companyName: contentData.companyName || "",
-      companyDescription: contentData.companyDescription || "",
-      vision: contentData.vision || "",
-      mission: contentData.mission || "",
-    });
-    setLoading(false);
+    try {
+      const [contentData, statsData, galleryData] = await Promise.all([
+        getAboutContent(),
+        getAboutStats(),
+        getAboutGallery(),
+      ]);
+      // Tampilkan SEMUA item (aktif & nonaktif) agar tetap bisa dikelola
+      setStats(statsData);
+      setGallery(galleryData);
+      setFormData({
+        heroImage: contentData.heroImage || "",
+        companyName: contentData.companyName || "",
+        companyDescription: contentData.companyDescription || "",
+        vision: contentData.vision || "",
+        mission: contentData.mission || "",
+      });
+    } catch (error) {
+      console.error("Error fetching tentang data:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleContentChange(name: string, value: string) {
@@ -99,7 +106,8 @@ export default function TentangAdmin() {
   }
 
   async function handleAddStat() {
-    if (!statForm.label || !statForm.value) return;
+    if (!statForm.label || !statForm.value || statSaving) return;
+    setStatSaving(true);
     try {
       const maxOrder = stats.length > 0 ? Math.max(...stats.map((s) => s.order)) : 0;
       await createAboutStat({
@@ -109,23 +117,35 @@ export default function TentangAdmin() {
       });
       setStatForm({ label: "", value: "", icon: "star" });
       setAddingStat(false);
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Error creating stat:", error);
       alert("Gagal menambahkan stat.");
     }
+    setStatSaving(false);
   }
 
   async function handleUpdateStat(id: string) {
-    if (!statForm.label || !statForm.value) return;
+    if (!statForm.label || !statForm.value || statSaving) return;
+    setStatSaving(true);
     try {
       await updateAboutStat(id, statForm);
       setEditingStat(null);
       setStatForm({ label: "", value: "", icon: "star" });
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Error updating stat:", error);
       alert("Gagal mengupdate stat.");
+    }
+    setStatSaving(false);
+  }
+
+  async function handleToggleStat(id: string, isActive: boolean) {
+    try {
+      await updateAboutStat(id, { isActive: !isActive });
+      await fetchData();
+    } catch (error) {
+      console.error("Error toggling stat:", error);
     }
   }
 
@@ -157,7 +177,8 @@ export default function TentangAdmin() {
   }
 
   async function handleAddGalleryItem() {
-    if (!galleryForm.imageUrl) return;
+    if (!galleryForm.imageUrl || gallerySaving) return;
+    setGallerySaving(true);
     try {
       const maxOrder = gallery.length > 0 ? Math.max(...gallery.map((g) => g.order)) : 0;
       await createAboutGalleryItem({
@@ -167,23 +188,35 @@ export default function TentangAdmin() {
       });
       setGalleryForm({ imageUrl: "", caption: "" });
       setAddingGallery(false);
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Error creating gallery item:", error);
       alert("Gagal menambahkan gambar.");
     }
+    setGallerySaving(false);
   }
 
   async function handleUpdateGalleryItem(id: string) {
-    if (!galleryForm.imageUrl) return;
+    if (!galleryForm.imageUrl || gallerySaving) return;
+    setGallerySaving(true);
     try {
       await updateAboutGalleryItem(id, galleryForm);
       setEditingGallery(null);
       setGalleryForm({ imageUrl: "", caption: "" });
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Error updating gallery item:", error);
       alert("Gagal mengupdate gambar.");
+    }
+    setGallerySaving(false);
+  }
+
+  async function handleToggleGalleryItem(id: string, isActive: boolean) {
+    try {
+      await updateAboutGalleryItem(id, { isActive: !isActive });
+      await fetchData();
+    } catch (error) {
+      console.error("Error toggling gallery item:", error);
     }
   }
 
@@ -362,8 +395,8 @@ export default function TentangAdmin() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleAddStat}>
-                  <Check className="w-4 h-4 mr-1" /> Simpan
+                <Button size="sm" onClick={handleAddStat} disabled={statSaving}>
+                  <Check className="w-4 h-4 mr-1" /> {statSaving ? "Menyimpan..." : "Simpan"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => { setAddingStat(false); setStatForm({ label: "", value: "", icon: "star" }); }}>
                   <X className="w-4 h-4 mr-1" /> Batal
@@ -374,7 +407,7 @@ export default function TentangAdmin() {
 
           <div className="space-y-3">
             {stats.map((stat, index) => (
-              <div key={stat.id} className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
+              <div key={stat.id} className={`flex items-center gap-3 bg-gray-50 rounded-lg p-3 ${!stat.isActive ? "opacity-50" : ""}`}>
                 <div className="flex flex-col gap-1">
                   <button
                     type="button"
@@ -436,7 +469,7 @@ export default function TentangAdmin() {
                 <div className="flex gap-1">
                   {editingStat === stat.id ? (
                     <>
-                      <Button size="sm" onClick={() => handleUpdateStat(stat.id)}>
+                      <Button size="sm" onClick={() => handleUpdateStat(stat.id)} disabled={statSaving}>
                         <Check className="w-4 h-4" />
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => { setEditingStat(null); setStatForm({ label: "", value: "", icon: "star" }); }}>
@@ -445,7 +478,15 @@ export default function TentangAdmin() {
                     </>
                   ) : (
                     <>
-                      <Button size="sm" variant="outline" onClick={() => { setEditingStat(stat.id); setStatForm({ label: stat.label, value: stat.value, icon: stat.icon }); }}>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleStat(stat.id, stat.isActive)}
+                        className={`p-1.5 rounded-lg transition-colors ${stat.isActive ? "bg-green-50 text-green-600 hover:bg-green-100" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`}
+                        title={stat.isActive ? "Nonaktifkan (sembunyikan dari website)" : "Aktifkan"}
+                      >
+                        <Power className="w-4 h-4" />
+                      </button>
+                      <Button size="sm" variant="outline" onClick={() => { setEditingStat(stat.id); setAddingStat(false); setStatForm({ label: stat.label, value: stat.value, icon: stat.icon }); }}>
                         <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => handleDeleteStat(stat.id)}>
@@ -458,7 +499,7 @@ export default function TentangAdmin() {
             ))}
 
             {stats.length === 0 && (
-              <p className="text-sm text-gray-500 text-center py-4">Belum ada stat. Klik "Tambah Stat" untuk menambahkan.</p>
+              <p className="text-sm text-gray-500 text-center py-4">Belum ada stat. Klik &quot;Tambah Stat&quot; untuk menambahkan.</p>
             )}
           </div>
         </div>
@@ -498,8 +539,8 @@ export default function TentangAdmin() {
                 />
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleAddGalleryItem}>
-                  <Check className="w-4 h-4 mr-1" /> Simpan
+                <Button size="sm" onClick={handleAddGalleryItem} disabled={gallerySaving}>
+                  <Check className="w-4 h-4 mr-1" /> {gallerySaving ? "Menyimpan..." : "Simpan"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => { setAddingGallery(false); setGalleryForm({ imageUrl: "", caption: "" }); }}>
                   <X className="w-4 h-4 mr-1" /> Batal
@@ -510,7 +551,7 @@ export default function TentangAdmin() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {gallery.map((item, index) => (
-              <div key={item.id} className="relative group">
+              <div key={item.id} className={`relative group ${!item.isActive ? "opacity-50" : ""}`}>
                 {editingGallery === item.id ? (
                   <div className="space-y-3 bg-gray-50 rounded-lg p-3">
                     <ImageUploadSingle
@@ -526,8 +567,8 @@ export default function TentangAdmin() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     />
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() => handleUpdateGalleryItem(item.id)}>
-                        <Check className="w-4 h-4 mr-1" /> Simpan
+                      <Button size="sm" onClick={() => handleUpdateGalleryItem(item.id)} disabled={gallerySaving}>
+                        <Check className="w-4 h-4 mr-1" /> {gallerySaving ? "Menyimpan..." : "Simpan"}
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => { setEditingGallery(null); setGalleryForm({ imageUrl: "", caption: "" }); }}>
                         <X className="w-4 h-4 mr-1" /> Batal
@@ -537,13 +578,22 @@ export default function TentangAdmin() {
                 ) : (
                   <>
                     <div className="aspect-video rounded-lg overflow-hidden border border-gray-200">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={item.imageUrl} alt={item.caption} className="w-full h-full object-cover" />
                     </div>
                     <p className="text-sm text-gray-700 mt-1 truncate">{item.caption || "Tanpa caption"}</p>
                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         type="button"
-                        onClick={() => { setEditingGallery(item.id); setGalleryForm({ imageUrl: item.imageUrl, caption: item.caption }); }}
+                        onClick={() => handleToggleGalleryItem(item.id, item.isActive)}
+                        className={`p-1.5 bg-white rounded shadow transition-colors ${item.isActive ? "text-green-600 hover:bg-green-50" : "text-gray-400 hover:bg-gray-100"}`}
+                        title={item.isActive ? "Nonaktifkan (sembunyikan dari website)" : "Aktifkan"}
+                      >
+                        <Power className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setEditingGallery(item.id); setAddingGallery(false); setGalleryForm({ imageUrl: item.imageUrl, caption: item.caption }); }}
                         className="p-1.5 bg-white rounded shadow text-gray-700 hover:bg-gray-100"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -581,7 +631,7 @@ export default function TentangAdmin() {
           </div>
 
           {gallery.length === 0 && !addingGallery && (
-            <p className="text-sm text-gray-500 text-center py-8">Belum ada gambar. Klik "Tambah Gambar" untuk menambahkan.</p>
+            <p className="text-sm text-gray-500 text-center py-4">Belum ada gambar. Klik &quot;Tambah Gambar&quot; untuk menambahkan.</p>
           )}
         </div>
       </Card>

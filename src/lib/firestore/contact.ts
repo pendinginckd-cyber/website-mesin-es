@@ -12,6 +12,7 @@ import {
   WHATSAPP_MESSAGE,
   decodeSafe,
 } from "@/lib/constants";
+import { normalizeWaPhone } from "@/lib/phone";
 
 const CONTACT_DOC_ID = "default";
 
@@ -28,7 +29,10 @@ export async function getContactInfo(): Promise<ContactInfo> {
       const data = docSnap.data();
       return {
         id: docSnap.id,
-        whatsappNumber: data.whatsappNumber || WHATSAPP_NUMBER,
+        // Lapisan defensif: nilai lama bisa berupa 08xx / +62 — rapikan saat baca
+        whatsappNumber: data.whatsappNumber
+          ? normalizeWaPhone(data.whatsappNumber)
+          : WHATSAPP_NUMBER,
         // Nilai lama di Firestore tersimpan ter-encode (%20) — bersihkan
         whatsappMessage: decodeSafe(data.whatsappMessage) || WHATSAPP_MESSAGE,
         email: data.email || "",
