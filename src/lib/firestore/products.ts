@@ -16,6 +16,7 @@ import {
 import { db } from "@/lib/firebase/client";
 import { Product } from "@/types/product";
 import { COLLECTIONS } from "@/lib/constants";
+import { safeFirestore } from "./safe";
 
 function getCollection(firestore: Firestore) {
   return collection(firestore, COLLECTIONS.PRODUCTS);
@@ -55,18 +56,21 @@ export async function getProducts(params?: {
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   if (!db) return null;
+  const firestore = db;
 
-  const q = query(getCollection(db), where("slug", "==", slug), limit(1));
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) return null;
+  return safeFirestore(async () => {
+    const q = query(getCollection(firestore), where("slug", "==", slug), limit(1));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
 
-  const docSnap = snapshot.docs[0];
-  return {
-    id: docSnap.id,
-    ...docSnap.data(),
-    createdAt: docSnap.data().createdAt?.toDate(),
-    updatedAt: docSnap.data().updatedAt?.toDate(),
-  } as Product;
+    const docSnap = snapshot.docs[0];
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+      createdAt: docSnap.data().createdAt?.toDate(),
+      updatedAt: docSnap.data().updatedAt?.toDate(),
+    } as Product;
+  }, null);
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
@@ -128,24 +132,26 @@ export async function getRelatedProducts(
 ): Promise<{ products: Product[]; hasMore: boolean }> {
   if (!db) return { products: [], hasMore: false };
 
-  const sameCategory = await getProducts({ category, isActive: true });
-  let related = sameCategory.filter((p) => p.slug !== currentSlug);
+  return safeFirestore(async () => {
+    const sameCategory = await getProducts({ category, isActive: true });
+    let related = sameCategory.filter((p) => p.slug !== currentSlug);
 
-  const hasMore = related.length > fetchLimit;
+    const hasMore = related.length > fetchLimit;
 
-  // If less than limit, fill with products from other categories
-  if (related.length < fetchLimit) {
-    const otherProducts = await getProducts({ isActive: true });
-    const additional = otherProducts
-      .filter((p) => p.slug !== currentSlug && !related.find((r) => r.slug === p.slug))
-      .slice(0, fetchLimit - related.length);
-    related = [...related, ...additional];
-  }
+    // If less than limit, fill with products from other categories
+    if (related.length < fetchLimit) {
+      const otherProducts = await getProducts({ isActive: true });
+      const additional = otherProducts
+        .filter((p) => p.slug !== currentSlug && !related.find((r) => r.slug === p.slug))
+        .slice(0, fetchLimit - related.length);
+      related = [...related, ...additional];
+    }
 
-  return {
-    products: related.slice(0, fetchLimit),
-    hasMore: hasMore || related.length > fetchLimit,
-  };
+    return {
+      products: related.slice(0, fetchLimit),
+      hasMore: hasMore || related.length > fetchLimit,
+    };
+  }, { products: [], hasMore: false });
 }
 
 export async function getOtherProducts(
@@ -155,15 +161,17 @@ export async function getOtherProducts(
 ): Promise<{ products: Product[]; hasMore: boolean }> {
   if (!db) return { products: [], hasMore: false };
 
-  const allProducts = await getProducts({ isActive: true });
-  const other = allProducts.filter(
-    (p) => p.slug !== currentSlug && p.category !== excludeCategory
-  );
+  return safeFirestore(async () => {
+    const allProducts = await getProducts({ isActive: true });
+    const other = allProducts.filter(
+      (p) => p.slug !== currentSlug && p.category !== excludeCategory
+    );
 
-  return {
-    products: other.slice(0, fetchLimit),
-    hasMore: other.length > fetchLimit,
-  };
+    return {
+      products: other.slice(0, fetchLimit),
+      hasMore: other.length > fetchLimit,
+    };
+  }, { products: [], hasMore: false });
 }
 
 export async function searchProducts(params: {

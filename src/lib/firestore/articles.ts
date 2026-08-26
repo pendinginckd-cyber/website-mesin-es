@@ -12,6 +12,7 @@ import {
   Timestamp,
   type Firestore,
 } from "firebase/firestore";
+import { safeFirestore } from "./safe";
 import { db } from "@/lib/firebase/client";
 import { Article } from "@/types/article";
 import { COLLECTIONS } from "@/lib/constants";
@@ -58,13 +59,17 @@ export async function getArticles(params?: {
 
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
   if (!db) return null;
-  const q = query(getCollection(db), where("slug", "==", slug), limit(1));
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) return null;
-  const docSnap = snapshot.docs[0];
-  const article = { id: docSnap.id, ...docSnap.data(), publishedAt: docSnap.data().publishedAt?.toDate(), createdAt: docSnap.data().createdAt?.toDate(), updatedAt: docSnap.data().updatedAt?.toDate() } as Article;
-  if (!article.isPublished) return null;
-  return article;
+  const firestore = db;
+
+  return safeFirestore(async () => {
+    const q = query(getCollection(firestore), where("slug", "==", slug), limit(1));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
+    const docSnap = snapshot.docs[0];
+    const article = { id: docSnap.id, ...docSnap.data(), publishedAt: docSnap.data().publishedAt?.toDate(), createdAt: docSnap.data().createdAt?.toDate(), updatedAt: docSnap.data().updatedAt?.toDate() } as Article;
+    if (!article.isPublished) return null;
+    return article;
+  }, null);
 }
 
 export async function getArticleById(id: string): Promise<Article | null> {

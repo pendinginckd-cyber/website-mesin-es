@@ -16,6 +16,7 @@ import {
 import { db } from "@/lib/firebase/client";
 import { Video } from "@/types/video";
 import { COLLECTIONS } from "@/lib/constants";
+import { safeFirestore } from "./safe";
 
 function getCollection(firestore: Firestore) {
   return collection(firestore, COLLECTIONS.VIDEOS);
@@ -84,10 +85,14 @@ export async function getVideos(params?: {
 
 export async function getVideoById(id: string): Promise<Video | null> {
   if (!db) return null;
-  const docRef = doc(db, COLLECTIONS.VIDEOS, id);
-  const docSnap = await getDoc(docRef);
-  if (!docSnap.exists()) return null;
-  return { id: docSnap.id, ...docSnap.data(), publishedAt: docSnap.data().publishedAt?.toDate(), createdAt: docSnap.data().createdAt?.toDate(), updatedAt: docSnap.data().updatedAt?.toDate() } as Video;
+  const firestore = db;
+
+  return safeFirestore(async () => {
+    const docRef = doc(firestore, COLLECTIONS.VIDEOS, id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return null;
+    return { id: docSnap.id, ...docSnap.data(), publishedAt: docSnap.data().publishedAt?.toDate(), createdAt: docSnap.data().createdAt?.toDate(), updatedAt: docSnap.data().updatedAt?.toDate() } as Video;
+  }, null);
 }
 
 export async function createVideo(data: Omit<Video, "id" | "createdAt" | "updatedAt">): Promise<string> {
