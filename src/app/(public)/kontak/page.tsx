@@ -19,6 +19,7 @@ export default function KontakPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [waLink, setWaLink] = useState("");
 
   function handleChange(name: string, value: string) {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -56,14 +57,18 @@ export default function KontakPage() {
         status: "new",
       });
 
+      const waNumber = contact?.whatsappNumber || WHATSAPP_NUMBER;
+      const lines = [
+        waMessage,
+        "",
+        `Nama: ${formData.name.trim()}`,
+        `No. HP: ${formData.phone.trim()}`,
+        formData.email.trim() ? `Email: ${formData.email.trim()}` : "",
+        `Produk: ${formData.productInterest || "-"}`,
+        `Pesan: ${formData.message.trim()}`,
+      ].filter(Boolean);
+      setWaLink(`https://wa.me/${waNumber}?text=${encodeURIComponent(lines.join("\n"))}`);
       setSubmitted(true);
-
-      setTimeout(() => {
-        const waNumber = contact?.whatsappNumber || WHATSAPP_NUMBER;
-        const waMessage = contact?.whatsappMessage || WHATSAPP_MESSAGE;
-        const fullMessage = `${waMessage}%0A%0ANama: ${formData.name}%0ANo. HP: ${formData.phone}%0AProduk: ${formData.productInterest || "-"}%0APesan: ${formData.message}`;
-        window.open(`https://wa.me/${waNumber}?text=${fullMessage}`, "_blank");
-      }, 3000);
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Gagal mengirim pesan. Silakan coba lagi atau hubungi kami via WhatsApp.");
@@ -90,20 +95,32 @@ export default function KontakPage() {
             <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Terima Kasih!</h1>
             <p className="text-lg text-gray-600 mb-2">
-              Pesan Anda telah berhasil dikirim.
+              Data Anda telah kami terima dan masuk ke sistem kami.
             </p>
             <p className="text-gray-500 mb-8">
-              Kami akan segera menghubungi Anda. Anda akan dialihkan ke WhatsApp...
+              Klik tombol di bawah untuk melanjutkan percakapan langsung via WhatsApp.
             </p>
             <a
-              href={`https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`}
+              href={waLink || `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
               <Phone className="w-5 h-5" />
-              Chat WhatsApp Sekarang
+              Kirim via WhatsApp
             </a>
+            <div className="mt-4">
+              <button
+                onClick={() => {
+                  setSubmitted(false);
+                  setFormData({ name: "", phone: "", email: "", productInterest: "", message: "" });
+                  setWaLink("");
+                }}
+                className="text-sm text-gray-500 hover:text-primary transition-colors"
+              >
+                Kirim pesan lainnya
+              </button>
+            </div>
           </div>
         </div>
       </div>
