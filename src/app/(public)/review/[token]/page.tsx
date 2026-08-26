@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
-import { createReview, markReviewLinkUsed, getReviewSettings } from "@/lib/firestore/reviews";
+import { submitReviewWithLink, getReviewSettings, validateReviewLink } from "@/lib/firestore/reviews";
 import { Review } from "@/types/review";
-import { SITE_URL } from "@/lib/constants";
-import { Star, Upload, CheckCircle, AlertCircle } from "lucide-react";
+import { Star, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ImageUploadSingle } from "@/components/ui/image-upload-single";
@@ -49,19 +49,36 @@ export default function ReviewPage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [autoApprove, setAutoApprove] = useState(false);
+  // "form" = tautan valid | "used" = sudah dipakai | "invalid" = tidak dikenal
+  const [status, setStatus] = useState<"checking" | "form" | "used" | "invalid">("checking");
 
   useEffect(() => {
     async function checkToken() {
       try {
         const settings = await getReviewSettings();
         setAutoApprove(settings.autoApprove);
-      } catch (error) {
-        console.error("Error fetching settings:", error);
+
+        const result = await validateReviewLink(token);
+        if (!result.valid) {
+          setStatus("invalid");
+        } else if (result.used) {
+          setStatus("used");
+        } else {
+          setForm((prev) => ({
+            ...prev,
+            customerName: result.customerName || prev.customerName,
+            customerPhone: result.customerPhone || prev.customerPhone,
+          }));
+          setStatus("form");
+        }
+      } catch (err) {
+        console.error("Error validating token:", err);
+        setStatus("invalid");
       }
       setLoading(false);
     }
     checkToken();
-  }, []);
+  }, [token]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -85,9 +102,14 @@ export default function ReviewPage() {
         reviewToken: token,
       };
 
-      const reviewId = await createReview(reviewData);
-      await markReviewLinkUsed(token, reviewId);
-      setSubmitted(true);
+      const result = await submitReviewWithLink(token, reviewData);
+      if (!result.ok) {
+        if (result.reason === "used") setStatus("used");
+        else if (result.reason === "invalid") setStatus("invalid");
+        else setError("Gagal mengirim review. Silakan coba lagi.");
+      } else {
+        setSubmitted(true);
+      }
     } catch (error) {
       console.error("Error submitting review:", error);
       setError("Gagal mengirim review. Silakan coba lagi.");
@@ -100,6 +122,50 @@ export default function ReviewPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (status === "used") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-6">
+            <CheckCircle className="w-8 h-8 text-blue-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">Tautan Sudah Digunakan</h1>
+          <p className="text-gray-600 mb-6">
+            Tautan review ini sudah pernah digunakan sebelumnya. Satu tautan hanya dapat dipakai satu kali.
+          </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Kembali ke Beranda
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "invalid") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-6">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">Tautan Tidak Valid</h1>
+          <p className="text-gray-600 mb-6">
+            Tautan review tidak dikenal atau telah dihapus. Silakan hubungi kami untuk mendapatkan tautan baru.
+          </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Kembali ke Beranda
+          </Link>
+        </div>
       </div>
     );
   }

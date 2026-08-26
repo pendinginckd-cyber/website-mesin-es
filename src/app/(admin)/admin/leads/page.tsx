@@ -11,6 +11,7 @@ import {
 } from "@/lib/firestore/leads";
 import { Lead } from "@/types/lead";
 import { WHATSAPP_MESSAGE } from "@/lib/constants";
+import { normalizeWaPhone } from "@/lib/phone";
 import {
   Trash2,
   MessageSquare,
@@ -96,17 +97,8 @@ export default function LeadsAdmin() {
     }
   }
 
-  function normalizePhone(phone: string): string {
-    const digits = phone.replace(/[^0-9]/g, "");
-    // wa.me mewajibkan format internasional tanpa awalan 0
-    if (digits.startsWith("62")) return digits;
-    if (digits.startsWith("0")) return "62" + digits.slice(1);
-    if (digits.startsWith("8")) return "62" + digits;
-    return digits;
-  }
-
   async function openWhatsApp(lead: Lead) {
-    const phone = normalizePhone(lead.phone);
+    const phone = normalizeWaPhone(lead.phone);
     const message = `Halo ${lead.name}, terima kasih sudah menghubungi kami. ${WHATSAPP_MESSAGE}`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
 

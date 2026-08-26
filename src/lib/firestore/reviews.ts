@@ -10,8 +10,8 @@ import {
   where,
   orderBy,
   limit,
+  runTransaction,
   Timestamp,
-  type Firestore,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { Review, ReviewSettings, ReviewLink } from "@/types/review";
@@ -136,10 +136,83 @@ export async function getReviewLinks(): Promise<ReviewLink[]> {
   })) as ReviewLink[];
 }
 
-export async function markReviewLinkUsed(linkId: string, reviewId: string): Promise<void> {
+export async function deleteReviewLink(id: string): Promise<void> {
   if (!db) throw new Error("Firestore not configured");
-  await updateDoc(doc(db, "reviewLinks", linkId), {
-    usedAt: Timestamp.now(),
-    reviewId,
-  });
+  await deleteDoc(doc(db, "reviewLinks", id));
+}
+
+export interface ValidateLinkResult {
+  valid: boolean;
+  used: boolean;
+  customerName?: string;
+  customerPhone?: string;
+}
+
+export async function validateReviewLink(
+  token: string
+): Promise<ValidateLinkResult> {
+  if (!db) return { valid: false, used: false };
+  try {
+    const q = query(collection(db, "reviewLinks"), where("token", "==", token), limit(1));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return { valid: false, used: false };
+    const data = snapshot.docs[0].data();
+    return {
+      valid: true,
+      used: !!data.usedAt,
+      customerName: data.customerName || undefined,
+      customerPhone: data.customerPhone || undefined,
+    };
+  } catch (error) {
+    console.error("validateReviewLink failed:", error);
+    return { valid: false, used: false };
+  }
+}
+
+export type SubmitReviewResult =
+  | { ok: true; reviewId: string }
+  | { ok: false; reason: "invalid" | "used" | "error" };
+
+/**
+ * Submit review dengan penegakan link sekali-pakai secara atomik:
+ * baca ulang link di dalam transaksi — jika sudah terpakai, batal.
+ */
+export async function submitReviewWithLink(
+  token: string,
+  reviewData: Omit<Review, "id" | "submittedAt">
+): Promise<SubmitReviewResult> {
+  if (!db) return { ok: false, reason: "error" };
+  const firestore = db;
+
+  try {
+    const q = query(collection(firestore, "reviewLinks"), where("token", "==", token), limit(1));
+    const snap = await getDocs(q);
+    if (snap.empty) return { ok: false, reason: "invalid" };
+    const linkDocId = snap.docs[0].id;
+
+    const reviewId = await runTransaction(firestore, async (tx) => {
+      const fresh = await tx.get(doc(firestore, "reviewLinks", linkDocId));
+      if (!fresh.exists()) throw new Error("__invalid");
+      if (fresh.data().usedAt) throw new Error("__used");
+
+      const reviewRef = doc(collection(firestore, "reviews"));
+      tx.set(reviewRef, {
+        ...reviewData,
+        submittedAt: Timestamp.now(),
+      });
+      tx.update(doc(firestore, "reviewLinks", linkDocId), {
+        usedAt: Timestamp.now(),
+        reviewId: reviewRef.id,
+      });
+      return reviewRef.id;
+    });
+
+    return { ok: true, reviewId };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "";
+    if (msg === "__used") return { ok: false, reason: "used" };
+    if (msg === "__invalid") return { ok: false, reason: "invalid" };
+    console.error("submitReviewWithLink failed:", error);
+    return { ok: false, reason: "error" };
+  }
 }

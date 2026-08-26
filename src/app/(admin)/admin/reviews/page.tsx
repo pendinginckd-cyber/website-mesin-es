@@ -11,20 +11,23 @@ import {
   updateReviewSettings,
   createReviewLink,
   getReviewLinks,
+  deleteReviewLink,
 } from "@/lib/firestore/reviews";
 import { Review, ReviewLink } from "@/types/review";
 import { SITE_URL } from "@/lib/constants";
+import { copyToClipboard } from "@/lib/clipboard";
+import { normalizeWaPhone } from "@/lib/phone";
 import {
   Star,
   CheckCircle,
   XCircle,
   Clock,
   Trash2,
-  Eye,
   MessageSquare,
   Link2,
   Copy,
   Check,
+  RefreshCw,
 } from "lucide-react";
 
 const STATUS_CONFIG = {
@@ -33,6 +36,14 @@ const STATUS_CONFIG = {
   rejected: { label: "Rejected", color: "bg-red-100 text-red-700", icon: XCircle },
 };
 
+function generateToken(): string {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 export default function ReviewsAdmin() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [links, setLinks] = useState<ReviewLink[]>([]);
@@ -40,8 +51,8 @@ export default function ReviewsAdmin() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [linkForm, setLinkForm] = useState({ customerPhone: "", customerName: "" });
-  const [generatedLink, setGeneratedLink] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [generated, setGenerated] = useState<{ link: string; name?: string; phone: string } | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -97,16 +108,22 @@ export default function ReviewsAdmin() {
   }
 
   async function handleGenerateLink() {
-    if (!linkForm.customerPhone) return;
+    if (!linkForm.customerPhone.trim()) {
+      alert("Isi nomor WhatsApp pelanggan terlebih dahulu.");
+      return;
+    }
     try {
-      const token = Math.random().toString(36).substring(2, 15);
+      const token = generateToken();
       await createReviewLink({
         token,
-        customerPhone: linkForm.customerPhone,
-        customerName: linkForm.customerName || undefined,
+        customerPhone: linkForm.customerPhone.trim(),
+        customerName: linkForm.customerName.trim() || undefined,
       });
-      const link = `${SITE_URL}/review/${token}`;
-      setGeneratedLink(link);
+      setGenerated({
+        link: `${SITE_URL}/review/${token}`,
+        name: linkForm.customerName.trim() || undefined,
+        phone: linkForm.customerPhone.trim(),
+      });
       setLinkForm({ customerPhone: "", customerName: "" });
       fetchData();
     } catch (error) {
@@ -115,14 +132,46 @@ export default function ReviewsAdmin() {
     }
   }
 
-  async function handleCopyLink() {
-    if (!generatedLink) return;
+  async function handleCopy(value: string, id: string) {
+    const ok = await copyToClipboard(value);
+    if (ok) {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    }
+  }
+
+  function buildWaMessage(name: string | undefined, link: string): string {
+    return [
+      `Halo ${name || "Kak"}, terima kasih telah mempercayai kami! 🙏`,
+      "",
+      "Bila berkenan, mohon luangkan waktu sejenak untuk memberikan ulasan melalui tautan berikut:",
+      link,
+      "",
+      "Ulasan Anda sangat berarti bagi kami. Terima kasih!",
+    ].join("\n");
+  }
+
+  function openWaFor(name: string | undefined, phone: string, link: string) {
+    const target = normalizeWaPhone(phone);
+    window.open(
+      `https://wa.me/${target}?text=${encodeURIComponent(buildWaMessage(name, link))}`,
+      "_blank"
+    );
+  }
+
+  function sendGeneratedLink() {
+    if (!generated) return;
+    openWaFor(generated.name, generated.phone, generated.link);
+  }
+
+  async function handleDeleteLink(id: string) {
+    if (!confirm("Hapus link review ini? Tautan yang sudah terlanjur dibagikan akan menjadi tidak valid.")) return;
     try {
-      await navigator.clipboard.writeText(generatedLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await deleteReviewLink(id);
+      fetchData();
     } catch (error) {
-      console.error("Error copying:", error);
+      console.error("Error deleting link:", error);
+      alert("Gagal menghapus link.");
     }
   }
 
@@ -151,6 +200,10 @@ export default function ReviewsAdmin() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Manajemen Review</h2>
+        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
+          <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} />
+          Refresh
+        </Button>
       </div>
 
       {/* Stats */}
@@ -204,10 +257,13 @@ export default function ReviewsAdmin() {
       {/* Generate Review Link */}
       <Card>
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
             <Link2 className="w-5 h-5 text-primary" />
-            Generate Link Review untuk Pelanggan
+            Kirim Link Review ke Pelanggan
           </h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Link bersifat sekali pakai — otomatis tidak berlaku setelah pelanggan mengirim review.
+          </p>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -239,20 +295,109 @@ export default function ReviewsAdmin() {
               <Link2 className="w-4 h-4 mr-1" /> Generate Link
             </Button>
 
-            {generatedLink && (
-              <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <input
-                  type="text"
-                  value={generatedLink}
-                  readOnly
-                  className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm"
-                />
-                <Button size="sm" variant="outline" onClick={handleCopyLink}>
-                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </Button>
+            {generated && (
+              <div className="space-y-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={generated.link}
+                    readOnly
+                    className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm"
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleCopy(generated.link, "__generated")}
+                    title="Salin link"
+                  >
+                    {copiedId === "__generated" ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                  <Button size="sm" variant="primary" onClick={sendGeneratedLink}>
+                    <MessageSquare className="w-4 h-4 mr-1" /> Kirim via WhatsApp
+                  </Button>
+                </div>
               </div>
             )}
           </div>
+        </div>
+      </Card>
+
+      {/* Riwayat Link */}
+      <Card>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-primary" />
+            Riwayat Link ({links.length})
+          </h3>
+          {links.length > 0 ? (
+            <div className="space-y-2">
+              {links.map((link) => {
+                const isUsed = !!link.usedAt;
+                return (
+                  <div
+                    key={link.id}
+                    className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-sm text-gray-900">
+                          {link.customerName || link.customerPhone}
+                        </span>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full ${
+                            isUsed ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {isUsed ? "Dipakai" : "Belum dipakai"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
+                        <span>{link.sentAt?.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}</span>
+                        <span className="truncate">{SITE_URL}/review/{link.token}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => handleCopy(`${SITE_URL}/review/${link.token}`, link.id)}
+                        className="p-2 text-gray-500 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Salin link"
+                      >
+                        {copiedId === link.id ? (
+                          <Check className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                      {!isUsed && (
+                        <button
+                          onClick={() =>
+                            openWaFor(link.customerName, link.customerPhone, `${SITE_URL}/review/${link.token}`)
+                          }
+                          className="p-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                          title="Kirim ulang via WhatsApp"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteLink(link.id)}
+                        className="p-2 bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition-colors"
+                        title="Hapus link"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400">Belum ada link yang dibuat.</p>
+          )}
         </div>
       </Card>
 
@@ -311,6 +456,7 @@ export default function ReviewsAdmin() {
                 <div className="flex items-start gap-4">
                   <div className="shrink-0">
                     {review.photo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={review.photo}
                         alt={review.customerName}
