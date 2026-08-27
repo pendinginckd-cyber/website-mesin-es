@@ -17,11 +17,13 @@ import {
   Building2,
   Truck,
   Eye,
+  Wrench,
 } from "lucide-react";
 
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/produk", icon: Package, label: "Produk" },
+  { href: "/admin/sparepart", icon: Wrench, label: "Sparepart" },
   { href: "/admin/artikel", icon: FileText, label: "Artikel" },
   { href: "/admin/testimoni", icon: MessageSquare, label: "Testimoni" },
   { href: "/admin/faq", icon: HelpCircle, label: "FAQ" },

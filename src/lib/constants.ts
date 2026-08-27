@@ -30,6 +30,7 @@ export const COLLECTIONS = {
   BANNERS: "banners",
   LEADS: "leads",
   ADMINS: "admins",
+  SPAREPARTS: "spareparts",
 } as const;
 
 export const VIDEO_CATEGORIES = [

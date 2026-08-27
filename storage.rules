@@ -55,6 +55,12 @@ service firebase.storage {
       allow write: if isAdmin();
     }
 
+    // Sparepart images: read publik, write admin
+    match /spareparts/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Review photos: read publik, create publik (customer upload), write admin
     match /reviews/{allPaths=**} {
       allow read: if true;

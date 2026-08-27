@@ -18,6 +18,7 @@ import { ProdukSearchDropdown } from "@/components/public/produk-search-dropdown
 const navLinks = [
   { href: "/", label: "Beranda" },
   { href: "/produk", label: "Produk" },
+  { href: "/sparepart", label: "Sparepart" },
   { href: "/artikel", label: "Artikel" },
   { href: "/video", label: "Video" },
   { href: "/galeri", label: "Galeri" },
