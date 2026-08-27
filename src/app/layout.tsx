@@ -30,6 +30,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     siteName: "Mesin Es Kristal",
+    images: [
+      {
+        url: "/icon.png?v=2",
+        width: 512,
+        height: 512,
+        alt: "Mesin Es Kristal",
+      },
+    ],
   },
   icons: {
     icon: [

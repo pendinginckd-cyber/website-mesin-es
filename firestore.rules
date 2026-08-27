@@ -110,9 +110,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // ReviewLinks: read/write admin only
+    // ReviewLinks: read publik, create/delete admin, update untuk submit review
     match /reviewLinks/{linkId} {
-      allow read, write: if isAdmin();
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || request.auth == null;
     }
 
     // Admins: read/write hanya admin yang bersangkutan
