@@ -32,22 +32,18 @@ export const metadata: Metadata = {
     siteName: "Mesin Es Kristal",
     images: [
       {
-        url: "/icon.png?v=2",
+        url: "/icon.png",
         width: 512,
         height: 512,
         alt: "Mesin Es Kristal",
       },
     ],
   },
-  icons: {
-    icon: [
-      { url: "/favicon.ico?v=2", sizes: "any" },
-      { url: "/icon.png?v=2", sizes: "32x32", type: "image/png" },
-      { url: "/icon.png?v=2", sizes: "192x192", type: "image/png" },
-      { url: "/icon.png?v=2", sizes: "512x512", type: "image/png" },
-    ],
-    apple: "/icon.png?v=2",
+  twitter: {
+    card: "summary_large_image",
+    images: ["/icon.png"],
   },
+  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {

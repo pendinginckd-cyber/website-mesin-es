@@ -9,12 +9,16 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/icon.png?v=2",
+        url: "/icon.png",
         width: 512,
         height: 512,
         alt: "Mesin Es Kristal",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/icon.png"],
   },
 };
 
