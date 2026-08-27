@@ -123,6 +123,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // SparepartSettings: read publik, write admin
+    match /sparepartSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Admins: read/write hanya admin yang bersangkutan
     match /admins/{adminId} {
       allow read: if request.auth != null && request.auth.uid == adminId;

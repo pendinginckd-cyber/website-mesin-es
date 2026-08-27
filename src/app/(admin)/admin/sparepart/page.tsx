@@ -5,13 +5,26 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { ChevronDown, ChevronUp, Plus, Trash2, Edit2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Plus,
+  Trash2,
+  Edit2,
+  X,
+  Settings,
+} from "lucide-react";
 import {
   getSpareparts,
   createSparepart,
   updateSparepart,
   deleteSparepart,
 } from "@/lib/firestore/spareparts";
+import {
+  getSparepartSettings,
+  addSparepartCategory,
+  removeSparepartCategory,
+} from "@/lib/firestore/sparepart-settings";
 import { Sparepart } from "@/types/sparepart";
 
 interface SparepartFormData {
@@ -108,18 +121,26 @@ export default function SparepartAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<SparepartFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categoryLoading, setCategoryLoading] = useState(false);
 
   useEffect(() => {
-    fetchSpareparts();
+    fetchData();
   }, []);
 
-  async function fetchSpareparts() {
+  async function fetchData() {
     setLoading(true);
     try {
-      const data = await getSpareparts();
-      setSpareparts(data);
+      const [sparepartsData, settings] = await Promise.all([
+        getSpareparts(),
+        getSparepartSettings(),
+      ]);
+      setSpareparts(sparepartsData);
+      setCategories(settings.categories || []);
     } catch (error) {
-      console.error("Error fetching spareparts:", error);
+      console.error("Error fetching data:", error);
     }
     setLoading(false);
   }
@@ -200,7 +221,7 @@ export default function SparepartAdmin() {
       }
 
       closeForm();
-      fetchSpareparts();
+      fetchData();
     } catch (error) {
       console.error("Error saving sparepart:", error);
       alert("Gagal menyimpan sparepart. Silakan coba lagi.");
@@ -215,11 +236,42 @@ export default function SparepartAdmin() {
     try {
       await deleteSparepart(id);
       alert("Sparepart berhasil dihapus!");
-      fetchSpareparts();
+      fetchData();
     } catch (error) {
       console.error("Error deleting sparepart:", error);
       alert("Gagal menghapus sparepart.");
     }
+  }
+
+  async function handleAddCategory() {
+    if (!newCategory.trim()) return;
+    if (categories.some((c) => c.toLowerCase() === newCategory.trim().toLowerCase())) {
+      alert("Kategori sudah ada!");
+      return;
+    }
+    setCategoryLoading(true);
+    try {
+      await addSparepartCategory(newCategory.trim());
+      setNewCategory("");
+      fetchData();
+    } catch (error) {
+      console.error("Error adding category:", error);
+      alert("Gagal menambah kategori.");
+    }
+    setCategoryLoading(false);
+  }
+
+  async function handleRemoveCategory(category: string) {
+    if (!confirm(`Hapus kategori "${category}"? Sparepart yang menggunakan kategori ini tidak akan terpengaruh.`)) return;
+    setCategoryLoading(true);
+    try {
+      await removeSparepartCategory(category);
+      fetchData();
+    } catch (error) {
+      console.error("Error removing category:", error);
+      alert("Gagal menghapus kategori.");
+    }
+    setCategoryLoading(false);
   }
 
   if (loading) {
@@ -239,6 +291,68 @@ export default function SparepartAdmin() {
           Tambah Sparepart
         </Button>
       </div>
+
+      {/* Category Manager */}
+      <Card>
+        <div className="p-6">
+          <button
+            onClick={() => setShowCategoryManager(!showCategoryManager)}
+            className="w-full flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2">
+              <Settings className="w-5 h-5 text-gray-500" />
+              <h3 className="text-lg font-semibold text-gray-900">Kelola Kategori</h3>
+            </div>
+            {showCategoryManager ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+
+          {showCategoryManager && (
+            <div className="mt-4 space-y-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
+                  placeholder="Nama kategori baru..."
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                />
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleAddCategory}
+                  disabled={categoryLoading || !newCategory.trim()}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Tambah
+                </Button>
+              </div>
+
+              {categories.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <div
+                      key={cat}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full"
+                    >
+                      <span className="text-sm text-blue-800">{cat}</span>
+                      <button
+                        onClick={() => handleRemoveCategory(cat)}
+                        className="p-0.5 hover:bg-blue-100 rounded-full transition-colors"
+                        title="Hapus kategori"
+                      >
+                        <X className="w-3 h-3 text-blue-600" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">Belum ada kategori. Tambahkan kategori baru di atas.</p>
+              )}
+            </div>
+          )}
+        </div>
+      </Card>
 
       {showForm && (
         <Card className="max-w-4xl">
@@ -263,7 +377,31 @@ export default function SparepartAdmin() {
                 </div>
                 <div>
                   <Label>Kategori</Label>
-                  <InputField name="category" value={formData.category} onChange={handleChange} required placeholder="Cooling Tower" />
+                  <div className="flex gap-2">
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={(e) => handleChange("category", e.target.value)}
+                      required
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                    >
+                      <option value="">Pilih kategori</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowCategoryManager(true)}
+                      title="Kelola kategori"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div>
                   <Label>Stok</Label>
