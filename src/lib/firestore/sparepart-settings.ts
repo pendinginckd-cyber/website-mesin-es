@@ -1,7 +1,7 @@
 import {
   doc,
   getDoc,
-  updateDoc,
+  setDoc,
   arrayUnion,
   arrayRemove,
   Timestamp,
@@ -44,17 +44,17 @@ export async function addSparepartCategory(category: string): Promise<void> {
   if (!trimmed) return;
 
   const docRef = doc(db, "sparepartSettings", SETTINGS_DOC_ID);
-  await updateDoc(docRef, {
+  await setDoc(docRef, {
     categories: arrayUnion(trimmed),
     updatedAt: Timestamp.now(),
-  });
+  }, { merge: true });
 }
 
 export async function removeSparepartCategory(category: string): Promise<void> {
   if (!db) throw new Error("Firestore not configured");
   const docRef = doc(db, "sparepartSettings", SETTINGS_DOC_ID);
-  await updateDoc(docRef, {
+  await setDoc(docRef, {
     categories: arrayRemove(category),
     updatedAt: Timestamp.now(),
-  });
+  }, { merge: true });
 }

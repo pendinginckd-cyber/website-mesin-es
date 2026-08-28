@@ -253,10 +253,10 @@ export default function SparepartAdmin() {
     try {
       await addSparepartCategory(newCategory.trim());
       setNewCategory("");
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Error adding category:", error);
-      alert("Gagal menambah kategori.");
+      alert("Gagal menambah kategori. Pastikan Anda sudah login sebagai admin.");
     }
     setCategoryLoading(false);
   }
@@ -266,10 +266,10 @@ export default function SparepartAdmin() {
     setCategoryLoading(true);
     try {
       await removeSparepartCategory(category);
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Error removing category:", error);
-      alert("Gagal menghapus kategori.");
+      alert("Gagal menghapus kategori. Pastikan Anda sudah login sebagai admin.");
     }
     setCategoryLoading(false);
   }
