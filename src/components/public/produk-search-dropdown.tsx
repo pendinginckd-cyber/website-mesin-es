@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, Clock, Trash2, Package, Newspaper, Video } from "lucide-react";
+import { Search, X, Clock, Trash2, Package, Newspaper, Video, Wrench } from "lucide-react";
 import { useSearchHistory } from "@/hooks/use-search-history";
 import { useSearchContent } from "@/hooks/use-search-content";
 
@@ -42,7 +42,7 @@ export function ProdukSearchDropdown({ isOpen, onClose, defaultValue, onSearch, 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { history, addToHistory, removeFromHistory, clearHistory } = useSearchHistory();
-  const { products, articles, videos, loaded } = useSearchContent(isOpen);
+  const { products, articles, videos, spareparts, loaded } = useSearchContent(isOpen);
 
   // Animation
   useEffect(() => {
@@ -99,10 +99,22 @@ export function ProdukSearchDropdown({ isOpen, onClose, defaultValue, onSearch, 
       .slice(0, 4);
   }, [query, videos]);
 
+  const sparepartSuggestions = useMemo(() => {
+    if (!query) return [];
+    return spareparts.filter(
+      (s) =>
+        s.name.toLowerCase().includes(query) ||
+        s.description.toLowerCase().includes(query) ||
+        s.shortDescription.toLowerCase().includes(query) ||
+        s.category.toLowerCase().includes(query)
+    ).slice(0, 4);
+  }, [query, spareparts]);
+
   const hasResults =
     productSuggestions.length > 0 ||
     articleSuggestions.length > 0 ||
-    videoSuggestions.length > 0;
+    videoSuggestions.length > 0 ||
+    sparepartSuggestions.length > 0;
 
   function commitSearch(rawQuery: string) {
     const q = rawQuery.trim();
@@ -140,7 +152,7 @@ export function ProdukSearchDropdown({ isOpen, onClose, defaultValue, onSearch, 
           onKeyDown={(e) => {
             if (e.key === "Enter") commitSearch(value);
           }}
-          placeholder="Cari produk, artikel, video..."
+          placeholder="Cari produk, sparepart, artikel, video..."
           className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-lg outline-none focus:bg-gray-200 transition-colors placeholder:text-gray-400"
         />
       </div>
@@ -187,6 +199,44 @@ export function ProdukSearchDropdown({ isOpen, onClose, defaultValue, onSearch, 
                         </div>
                         <span className="ml-auto shrink-0 text-xs font-semibold text-primary">
                           {product.priceDisplay}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Spareparts */}
+              {sparepartSuggestions.length > 0 && (
+                <div>
+                  <SectionHeader icon={<Wrench className="w-3.5 h-3.5" />} label="Sparepart" />
+                  <ul>
+                    {sparepartSuggestions.map((sparepart) => (
+                      <li
+                        key={sparepart.id}
+                        onClick={() => openDetail(`/sparepart/${sparepart.slug}`)}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
+                      >
+                        {sparepart.thumbnail ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={sparepart.thumbnail}
+                            alt={sparepart.name}
+                            className="w-9 h-9 rounded object-cover border border-gray-200 shrink-0"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded bg-gray-100 flex items-center justify-center shrink-0">
+                            <Wrench className="w-4 h-4 text-gray-400" />
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-gray-800 truncate">
+                            <HighlightMatch text={sparepart.name} query={value.trim()} />
+                          </p>
+                          <p className="text-xs text-gray-400 truncate">Sparepart · {sparepart.category}</p>
+                        </div>
+                        <span className="ml-auto shrink-0 text-xs font-semibold text-primary">
+                          Rp {sparepart.price.toLocaleString("id-ID")}
                         </span>
                       </li>
                     ))}

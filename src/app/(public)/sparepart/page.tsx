@@ -1,45 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getSpareparts } from "@/lib/firestore/spareparts";
+import { getSparepartSettings } from "@/lib/firestore/sparepart-settings";
 import { Sparepart } from "@/types/sparepart";
-import { Search, Filter } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Filter, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 
-export default function SparepartPage() {
+function SparepartPageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const [spareparts, setSpareparts] = useState<Sparepart[]>([]);
   const [filtered, setFiltered] = useState<Sparepart[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
 
+  const activeSearch = searchParams.get("search") || "";
+  const activeCategory = searchParams.get("kategori") || "";
+
   useEffect(() => {
-    async function fetchSpareparts() {
+    async function fetchData() {
       setLoading(true);
       try {
-        const data = await getSpareparts({ isActive: true });
+        const [data, settings] = await Promise.all([
+          getSpareparts({ isActive: true }),
+          getSparepartSettings(),
+        ]);
         setSpareparts(data);
-        setFiltered(data);
-        const cats = [...new Set(data.map((s) => s.category).filter(Boolean))];
-        setCategories(cats);
+        setCategories(settings.categories || []);
       } catch (error) {
         console.error("Error fetching spareparts:", error);
       }
       setLoading(false);
     }
-    fetchSpareparts();
+    fetchData();
   }, []);
 
   useEffect(() => {
     let result = spareparts;
 
-    if (search) {
-      const keyword = search.toLowerCase();
+    if (activeSearch) {
+      const keyword = activeSearch.toLowerCase();
       result = result.filter(
         (s) =>
           s.name.toLowerCase().includes(keyword) ||
@@ -49,12 +55,34 @@ export default function SparepartPage() {
       );
     }
 
-    if (selectedCategory) {
-      result = result.filter((s) => s.category === selectedCategory);
+    if (activeCategory) {
+      result = result.filter((s) => s.category === activeCategory);
     }
 
     setFiltered(result);
-  }, [search, selectedCategory, spareparts]);
+  }, [activeSearch, activeCategory, spareparts]);
+
+  function handleCategoryChange(category: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (category) {
+      params.set("kategori", category);
+    } else {
+      params.delete("kategori");
+    }
+    router.push(`/sparepart?${params.toString()}`);
+  }
+
+  function clearSearch() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("search");
+    router.push(`/sparepart?${params.toString()}`);
+  }
+
+  function clearCategory() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("kategori");
+    router.push(`/sparepart?${params.toString()}`);
+  }
 
   if (loading) {
     return (
@@ -83,23 +111,47 @@ export default function SparepartPage() {
           </p>
         </div>
 
-        {/* Search & Filter */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari sparepart..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-            />
+        {/* Active Filters */}
+        {(activeSearch || activeCategory) && (
+          <div className="flex items-center gap-2 flex-wrap mb-6">
+            {activeSearch && (
+              <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full pl-4 pr-2 py-2 shadow-sm">
+                <span className="text-sm text-gray-700">
+                  Pencarian: <strong className="text-gray-900">&quot;{activeSearch}&quot;</strong>
+                </span>
+                <button
+                  onClick={clearSearch}
+                  className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Hapus pencarian"
+                >
+                  <X className="w-3.5 h-3.5 text-gray-500" />
+                </button>
+              </div>
+            )}
+            {activeCategory && (
+              <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full pl-4 pr-2 py-2 shadow-sm">
+                <span className="text-sm text-gray-700">
+                  Kategori: <strong className="text-gray-900">{activeCategory}</strong>
+                </span>
+                <button
+                  onClick={clearCategory}
+                  className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Hapus filter kategori"
+                >
+                  <X className="w-3.5 h-3.5 text-gray-500" />
+                </button>
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-2">
+        )}
+
+        {/* Category Filter */}
+        {categories.length > 0 && (
+          <div className="flex items-center gap-2 mb-8">
             <Filter className="w-5 h-5 text-gray-400" />
             <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              value={activeCategory}
+              onChange={(e) => handleCategoryChange(e.target.value)}
               className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
             >
               <option value="">Semua Kategori</option>
@@ -110,13 +162,13 @@ export default function SparepartPage() {
               ))}
             </select>
           </div>
-        </div>
+        )}
 
         {/* Grid */}
         {filtered.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-lg border border-dashed border-gray-300">
             <p className="text-gray-500">
-              {search || selectedCategory
+              {activeSearch || activeCategory
                 ? "Tidak ada sparepart yang sesuai dengan pencarian Anda."
                 : "Belum ada sparepart tersedia."}
             </p>
@@ -166,5 +218,13 @@ export default function SparepartPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SparepartPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+      <SparepartPageContent />
+    </Suspense>
   );
 }

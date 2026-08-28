@@ -96,7 +96,9 @@ export function Navbar() {
   }
 
   function handleSearch(query: string) {
-    router.push(`/produk?search=${encodeURIComponent(query)}`);
+    const path = window.location.pathname;
+    const target = path.startsWith("/sparepart") ? "/sparepart" : "/produk";
+    router.push(`${target}?search=${encodeURIComponent(query)}`);
     setSearchOpen(false);
   }
 
