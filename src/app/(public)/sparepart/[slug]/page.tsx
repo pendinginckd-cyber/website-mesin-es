@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getSparepartBySlug } from "@/lib/firestore/spareparts";
+import { getProducts } from "@/lib/firestore/products";
 import { Sparepart } from "@/types/sparepart";
+import { Product } from "@/types/product";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
-import { Phone, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { Phone, ArrowLeft, ChevronLeft, ChevronRight, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,19 +21,29 @@ export default function SparepartDetailPage() {
   const [sparepart, setSparepart] = useState<Sparepart | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [otherProducts, setOtherProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    async function fetchSparepart() {
+    async function fetchData() {
       setLoading(true);
       try {
         const data = await getSparepartBySlug(slug);
         setSparepart(data);
+
+        if (data) {
+          const allProducts = await getProducts({ isActive: true });
+          const related = allProducts.filter((p) => p.isFeatured).slice(0, 4);
+          const other = allProducts.filter((p) => !p.isFeatured).slice(0, 4);
+          setRelatedProducts(related);
+          setOtherProducts(other);
+        }
       } catch (error) {
-        console.error("Error fetching sparepart:", error);
+        console.error("Error fetching data:", error);
       }
       setLoading(false);
     }
-    fetchSparepart();
+    fetchData();
   }, [slug]);
 
   if (loading) {
@@ -168,6 +180,90 @@ export default function SparepartDetailPage() {
             </a>
           </div>
         </div>
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Produk Terkait
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((product) => (
+                <Link key={product.id} href={`/produk/${product.slug}`}>
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
+                    <div className="aspect-square bg-gray-100 relative">
+                      {product.thumbnail ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={product.thumbnail}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <Package className="w-8 h-8" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4 flex-1 flex flex-col">
+                      <Badge className="bg-blue-100 text-blue-800 w-fit mb-2">
+                        {product.category}
+                      </Badge>
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                        {product.name}
+                      </h3>
+                      <p className="text-lg font-bold text-primary">
+                        {product.priceDisplay}
+                      </p>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Other Products */}
+        {otherProducts.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Produk Lainnya
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {otherProducts.map((product) => (
+                <Link key={product.id} href={`/produk/${product.slug}`}>
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
+                    <div className="aspect-square bg-gray-100 relative">
+                      {product.thumbnail ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={product.thumbnail}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <Package className="w-8 h-8" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4 flex-1 flex flex-col">
+                      <Badge className="bg-blue-100 text-blue-800 w-fit mb-2">
+                        {product.category}
+                      </Badge>
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                        {product.name}
+                      </h3>
+                      <p className="text-lg font-bold text-primary">
+                        {product.priceDisplay}
+                      </p>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
