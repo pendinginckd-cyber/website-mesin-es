@@ -40,41 +40,43 @@ function ProdukPageContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-900 mb-4">
-            Katalog Mesin Es Kristal
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Pilihan mesin es kristal berkualitas untuk kebutuhan usaha Anda.
-          </p>
-        </div>
-
-        {/* Active Search Chip */}
-        {activeSearch && (
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full pl-4 pr-2 py-2 shadow-sm">
-              <span className="text-sm text-gray-700">
-                Hasil pencarian:{" "}
-                <strong className="text-gray-900">&quot;{activeSearch}&quot;</strong>
-              </span>
-              <button
-                onClick={() => router.push("/produk")}
-                className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label="Hapus pencarian"
-              >
-                <X className="w-3.5 h-3.5 text-gray-500" />
-              </button>
-            </div>
+      <div className="max-w-7xl mx-auto py-12">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-blue-900 mb-4">
+              Katalog Mesin Es Kristal
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Pilihan mesin es kristal berkualitas untuk kebutuhan usaha Anda.
+            </p>
           </div>
-        )}
+
+          {/* Active Search Chip */}
+          {activeSearch && (
+            <div className="flex items-center justify-center mb-8">
+              <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full pl-4 pr-2 py-2 shadow-sm">
+                <span className="text-sm text-gray-700">
+                  Hasil pencarian:{" "}
+                  <strong className="text-gray-900">&quot;{activeSearch}&quot;</strong>
+                </span>
+                <button
+                  onClick={() => router.push("/produk")}
+                  className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Hapus pencarian"
+                >
+                  <X className="w-3.5 h-3.5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Product Grid */}
         <ProdukGrid products={filteredProducts} loading={loading} />
 
         {/* Empty State */}
         {!loading && !filteredProducts.length && (
-          <div className="text-center py-16">
+          <div className="text-center py-16 px-4">
             <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
               <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />

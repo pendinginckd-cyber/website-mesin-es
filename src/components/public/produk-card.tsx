@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, MessageCircle, Scale } from "lucide-react";
+import { MessageCircle, Scale } from "lucide-react";
 import { Card, CardImage, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
@@ -30,10 +30,10 @@ export function ProdukCard({ product }: ProdukCardProps) {
   );
 
   return (
-    <Card hover className="h-full flex flex-col group relative overflow-hidden">
+    <Card hover className="h-full flex flex-col group relative overflow-hidden bg-white">
       {certBadge && (
-        <div className="absolute top-3 left-3 z-10" style={{ fontSize: "11px" }}>
-          <Badge variant="success" className="px-2 py-1 shadow-md">
+        <div className="absolute top-2 left-2 z-10" style={{ fontSize: "10px" }}>
+          <Badge variant="success" className="px-1.5 py-0.5 shadow-md">
             {certBadge}
           </Badge>
         </div>
@@ -41,7 +41,7 @@ export function ProdukCard({ product }: ProdukCardProps) {
 
       <Link
         href={`/produk/${product.slug}`}
-        className="block relative overflow-hidden aspect-[4/3] tap-effect"
+        className="block relative overflow-hidden aspect-square tap-effect"
         aria-label={`Lihat detail ${product.name}`}
       >
         <Image
@@ -54,8 +54,8 @@ export function ProdukCard({ product }: ProdukCardProps) {
         />
       </Link>
 
-      <CardContent className="flex-1 flex flex-col p-3">
-        <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2" style={{ fontSize: "13px" }}>
+      <CardContent className="flex-1 flex flex-col p-2.5">
+        <h3 className="font-medium text-gray-900 leading-snug line-clamp-2" style={{ fontSize: "13px" }}>
           <Link
             href={`/produk/${product.slug}`}
             className="hover:text-primary transition-colors"
@@ -64,41 +64,26 @@ export function ProdukCard({ product }: ProdukCardProps) {
           </Link>
         </h3>
 
-        <div className="space-y-0.5 mb-0.5" style={{ fontSize: "10px" }}>
-          <div className="text-gray-700 line-clamp-1">
-            Kapasitas: {product.capacity}
-          </div>
-
-          {product.power && (
-            <div className="text-gray-700 line-clamp-1">
-              Daya: {product.power}
-            </div>
-          )}
+        <div className="mt-1.5">
+          <span className="font-bold text-primary text-sm">{priceText}</span>
+          <span className="text-gray-400 ml-1" style={{ fontSize: "10px" }}>/ unit</span>
         </div>
 
-        <div className="mb-0.5">
-          <span className="font-bold text-primary" style={{ fontSize: "10px" }}>
-            {priceText}
-          </span>
-          <span className="text-gray-500 ml-1" style={{ fontSize: "11px" }}>/ unit</span>
+        <div className="mt-0.5 text-gray-500 line-clamp-1" style={{ fontSize: "11px" }}>
+          {product.capacity}
+          {product.power ? ` • ${product.power}` : ""}
         </div>
 
-        <div className="mt-auto flex flex-col gap-2" style={{ fontSize: "11px" }}>
-          <Link
-            href={`/produk/${product.slug}`}
-            className="text-primary font-medium hover:underline inline-flex items-center gap-1 tap-effect"
-          >
-            Lihat Spesifikasi
-            <ArrowRight className="w-3 h-3" />
-          </Link>
+        <div className="mt-auto pt-2 flex items-center gap-1.5">
           <Link
             href={`https://wa.me/${waNumber}?text=${whatsappMessage}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary font-medium hover:underline inline-flex items-center gap-1 tap-effect"
+            className="flex-1 flex items-center justify-center gap-1 bg-primary hover:bg-primary-dark text-white rounded-md py-1.5 transition-colors tap-effect"
+            style={{ fontSize: "11px" }}
           >
-            <MessageCircle className="w-3 h-3" />
-             Nego Harga
+            <MessageCircle className="w-3.5 h-3.5" />
+            Nego
           </Link>
           <button
             type="button"
@@ -111,16 +96,16 @@ export function ProdukCard({ product }: ProdukCardProps) {
                 ? "Hapus dari perbandingan"
                 : "Tambahkan ke perbandingan"
             }
-            className={`flex items-center justify-center gap-1.5 border rounded-lg py-1.5 px-2 transition-colors tap-effect ${
+            aria-label={inComparison ? "Hapus dari perbandingan" : "Bandingkan produk"}
+            className={`w-8 h-8 shrink-0 flex items-center justify-center border rounded-md transition-colors tap-effect ${
               inComparison
                 ? "bg-primary text-white border-primary"
                 : comparison.isFull
                 ? "border-gray-200 text-gray-300 cursor-not-allowed"
-                : "border-primary/30 text-primary hover:bg-primary hover:text-white"
+                : "border-gray-300 text-primary hover:bg-primary hover:text-white hover:border-primary"
             }`}
           >
-            <Scale className="w-3 h-3" />
-            {inComparison ? "Sedang Dibanding" : "Bandingkan"}
+            <Scale className="w-3.5 h-3.5" />
           </button>
         </div>
       </CardContent>
