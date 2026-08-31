@@ -26,6 +26,13 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+      { url: "/icon.png", type: "image/png", sizes: "409x409" },
+    ],
+    apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "409x409" }],
+  },
   openGraph: {
     type: "website",
     locale: "id_ID",
