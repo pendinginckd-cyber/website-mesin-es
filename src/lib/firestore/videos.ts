@@ -30,7 +30,7 @@ export async function getVideos(params?: {
 }): Promise<Video[]> {
   if (!db) return [];
 
-  const targetActive = params?.isActive ?? true;
+  const targetActive = params?.isActive;
 
   let q = query(getCollection(db), orderBy("publishedAt", "desc"));
   if (params?.category) q = query(q, where("category", "==", params.category));
@@ -47,8 +47,8 @@ export async function getVideos(params?: {
       updatedAt: doc.data().updatedAt?.toDate(),
     })) as Video[];
 
-    if (targetActive) {
-      videos = videos.filter((v) => v.isActive === true);
+    if (targetActive !== undefined) {
+      videos = videos.filter((v) => v.isActive === targetActive);
     }
 
     return videos;
@@ -63,8 +63,8 @@ export async function getVideos(params?: {
         updatedAt: doc.data().updatedAt?.toDate(),
       })) as Video[];
 
-      if (targetActive) {
-        videos = videos.filter((v) => v.isActive === true);
+      if (targetActive !== undefined) {
+        videos = videos.filter((v) => v.isActive === targetActive);
       }
       if (params?.category) {
         videos = videos.filter((v) => v.category === params.category);
