@@ -187,8 +187,9 @@
 
 **Files Modified:**
 - ✅ `public/icon.png`, `src/app/icon.png`, `src/app/apple-icon.png`
+- ✅ `public/favicon.ico` (+16×16 & 32×32 dari logo EKN, 31 Agu)
 - ✅ `public/manifest.json`
-- ✅ `src/app/layout.tsx`
+- ✅ `src/app/layout.tsx` (metadata `icons` eksplisit: favicon.ico + icon.png + apple-touch-icon)
 - ✅ `src/lib/constants.ts`
 
 ---
