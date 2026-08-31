@@ -361,6 +361,12 @@ export default async function ProdukDetailPage({ params }: PageProps) {
                       <dd className="font-bold text-primary">{product.roiEstimation.paybackPeriod}</dd>
                     </div>
                   </dl>
+                  <Link
+                    href={`/kalkulator?capacity=${product.capacityValue}&machinePrice=${product.price}`}
+                    className="mt-4 inline-flex items-center justify-center w-full bg-primary hover:bg-primary-dark text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    Hitung Simulasi ROI
+                  </Link>
                 </CardContent>
               </Card>
             )}

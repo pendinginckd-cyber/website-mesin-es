@@ -48,3 +48,39 @@ export async function deleteFaq(id: string): Promise<void> {
 
 export async function getActiveFaqs(): Promise<Faq[]> { return getFaqs({ isActive: true }); }
 export async function getFaqsByCategory(category: string): Promise<Faq[]> { return getFaqs({ category, isActive: true }); }
+
+const FAQ_STOPWORDS = new Set([
+  "mesin", "es", "kristal", "sparepart", "spare", "part", "komponen", "jual", "harga",
+  "murah", "original", "asli", "model", "tipe", "pengganti", "menggantikan", "dan",
+  "atau", "yang", "dari", "untuk", "dengan", "this", "the", "and", "for", "with",
+]);
+
+export async function getRelatedFaqs(keywords: string[], limit = 5): Promise<Faq[]> {
+  if (!db || keywords.length === 0) return [];
+  const all = await getFaqs({ isActive: true });
+  if (all.length === 0) return [];
+
+  const tokens = keywords
+    .flatMap((k) => k.toLowerCase().split(/[^a-z0-9]+/))
+    .map((t) => t.trim())
+    .filter((t) => t.length > 2 && !FAQ_STOPWORDS.has(t));
+
+  const scored = all.map((faq) => {
+    const haystack = `${faq.question} ${faq.answer}`.toLowerCase();
+    let score = 0;
+    for (const token of tokens) {
+      if (haystack.includes(token)) score += 1;
+    }
+    return { faq, score };
+  });
+
+  const matched = scored
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((s) => s.faq);
+
+  const matchedIds = new Set(matched.map((f) => f.id));
+  const technical = all.filter((f) => f.category === "teknis" && !matchedIds.has(f.id));
+
+  return [...matched, ...technical].slice(0, limit);
+}

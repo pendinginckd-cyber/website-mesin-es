@@ -1,13 +1,13 @@
 # Development Progress Tracker
 
-## Project: Website Mesin Es Kristal - 8 Fitur Tambahan
+## Project: Website Mesin Es Kristal - Fitur Tambahan + Sistem Sparepart
 
 ### Project Info
 - **Start Date:** 25 Agustus 2026
 - **Target Completion:** TBD
 - **Status:** 🚧 IN PROGRESS
-- **Total Estimasi:** ~13-17 jam kerja
 - **Tech Stack:** Next.js 16 + TypeScript + Tailwind CSS v4 + Firebase
+- **Last Updated:** 31 Agustus 2026
 
 ---
 
@@ -113,33 +113,143 @@
 
 ---
 
+## ✅ Feature: Sistem Sparepart (COMPLETED)
+
+**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026
+
+**Description:** Sistem manajemen & katalog sparepart mesin es kristal lengkap (admin CRUD, listing publik, halaman detail, SEO).
+
+**Features Implemented:**
+- ✅ Admin CRUD `/admin/sparepart` (tambah/edit/hapus, SEO fields)
+- ✅ Kelola kategori sparepart via `sparepartSettings` (tambah/hapus kategori)
+- ✅ Halaman publik `/sparepart` (search via URL params, filter kategori, chips)
+- ✅ Halaman detail `/sparepart/[slug]` (server component, full SEO: metadata, JSON-LD, canonical, robots)
+- ✅ Global search navbar termasuk spareparts
+- ✅ Sitemap termasuk semua URL sparepart
+- ✅ Badge stok (Tersedia/Indent/Habis), format harga Rp
+
+**Files Created:**
+- ✅ `src/types/sparepart.ts`
+- ✅ `src/lib/firestore/spareparts.ts`
+- ✅ `src/lib/firestore/sparepart-settings.ts` (setDoc merge untuk kategori)
+- ✅ `src/app/(admin)/admin/sparepart/page.tsx`
+- ✅ `src/app/(public)/sparepart/layout.tsx`
+- ✅ `src/app/(public)/sparepart/page.tsx`
+- ✅ `src/app/(public)/sparepart/[slug]/page.tsx`
+
+**Files Modified:**
+- ✅ `src/components/layout/navbar.tsx` (link + search sparepart)
+- ✅ `src/components/layout/admin-sidebar.tsx` (menu Sparepart)
+- ✅ `src/hooks/use-search-content.ts` (spareparts di search)
+- ✅ `src/lib/constants.ts` (COLLECTIONS.SPAREPARTS)
+- ✅ `src/app/sitemap.ts`
+- ✅ `firestore.rules`, `storage.rules`, `firestore.indexes.json` (indexes spareparts)
+
+**Firestore Collections:** `spareparts`, `sparepartSettings`
+
+---
+
+## ✅ Feature: System Review Pelanggan (COMPLETED)
+
+**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026
+
+**Description:** Customer bisa submit review (dengan foto) melalui link token unik dari WhatsApp; admin kelola review.
+
+**Features Implemented:**
+- ✅ Validasi token review (`reviewLinks`: read public, update by anonymous user)
+- ✅ Submit review + upload foto oleh pengunjung anonim (Storage `reviews/`: create public)
+- ✅ Halaman publik `/review/[token]`
+- ✅ Admin kelola review `/admin/reviews` (approve/reject/delete)
+- ✅ Fix bug upload: hapus duplicate `match /reviews` di storage.rules
+
+**Files Modified:**
+- ✅ `firestore.rules` (reviewLinks, reviews)
+- ✅ `storage.rules` (reviews/ create: true, remove duplicate)
+- ✅ `src/app/(public)/review/[token]/page.tsx`
+- ✅ `src/app/(admin)/admin/reviews/page.tsx`
+- ✅ `src/lib/firestore/reviews.ts`
+
+**Firestore Collections:** `reviewLinks`, `reviews`
+
+---
+
+## ✅ Feature: Branding & SEO Meta (COMPLETED)
+
+**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026
+
+**Description:** Ganti ikon default Next.js/Vercel dengan branding custom EKN + meta sosial lengkap.
+
+**Features Implemented:**
+- ✅ Custom favicon EKN (`icon.png`, `apple-icon.png`)
+- ✅ Web manifest (`manifest.json`)
+- ✅ OG/Twitter meta tags di `layout.tsx`
+- ✅ `decodeSafe()` wrapper untuk `NEXT_PUBLIC_SITE_URL` (Vercel pre-encoded `%20`)
+
+**Files Modified:**
+- ✅ `public/icon.png`, `src/app/icon.png`, `src/app/apple-icon.png`
+- ✅ `public/manifest.json`
+- ✅ `src/app/layout.tsx`
+- ✅ `src/lib/constants.ts`
+
+---
+
+## ✅ Feature: Enhancements Detail Sparepart (COMPLETED)
+
+**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026
+
+**Description:** Perbaikan tampilan & interaktivitas halaman detail sparepart.
+
+**Features Implemented:**
+- ✅ ShareButton (native share + clipboard fallback) di info section
+- ✅ Grid sparepart disamakan dengan grid produk (2 → 6 kolom responsive)
+- ✅ Deskripsi singkat (`shortDescription`) di info column; deskripsi panjang pindah ke Card `col-span-2`
+- ✅ Sidebar FAQ Terkait (keyword match nama+kategori, fallback kategori `teknis`)
+- ✅ `FaqAccordion` (expand/collapse seperti halaman FAQ)
+- ✅ Produk Terkait & Produk Lainnya: 6 item per section
+- ✅ Produk Lainnya = campuran produk non-featured + sparepart lain (badge stok + label SPAREPART, link sesuai tipe)
+
+**Files Created:**
+- ✅ `src/components/public/faq-accordion.tsx`
+
+**Files Modified:**
+- ✅ `src/app/(public)/sparepart/[slug]/page.tsx`
+- ✅ `src/app/(public)/sparepart/page.tsx` (grid sama dengan produk)
+- ✅ `src/lib/firestore/faqs.ts` (tambah `getRelatedFaqs`)
+
+---
+
 ## Phase 1: Kalkulator ROI Enhanced + Product Comparison
 
-### ✅ Fitur 1: Kalkulator ROI Enhanced
-**Status:** ⏳ PENDING | **Estimasi:** 2-3 jam | **Priority:** HIGH
+### ✅ Fitur 1: Kalkulator ROI Enhanced (COMPLETED)
 
-**Existing Files:**
-- `src/components/public/roi-calculator.tsx` - Basic calculator component
-- `src/lib/utils.ts` - `calculateROI()` function
+**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026
 
-**Enhancement Checklist:**
-- [ ] Buat standalone page `/kalkulator`
-- [ ] Tambah chart/graph visualization (revenue vs cost)
-- [ ] Save results ke localStorage
-- [ ] Share hasil via WhatsApp
-- [ ] Multiple scenarios comparison (2-3 skenario)
-- [ ] PDF export (optional)
+**Description:** Kalkulator ROI mesin es yang berdiri sendiri di halaman `/kalkulator` dengan chart visual, simpan multi-skenario, dan share via WhatsApp.
 
-**Files to Create:**
-- [ ] `src/app/(public)/kalkulator/page.tsx`
-- [ ] `src/components/public/roi-chart.tsx`
-- [ ] `src/components/public/roi-scenario-compare.tsx`
+**Features Implemented:**
+- ✅ Standalone page `/kalkulator` (server component, SEO metadata)
+- ✅ Input ditambah: Biaya Operasional Tambahan (Rp/hari)
+- ✅ Hasil: revenue, listrik, air, operasional+lainnya, profit harian/bulanan/tahunan, payback months (bulan+hari)
+- ✅ ROIChart (SVG bar chart revenue vs cost vs profit, split bar)
+- ✅ Save scenario ke localStorage (`roi_scenarios_v1`, max 5)
+- ✅ RoiScenarioCompare (tabel banding multi-skenario) via `useSyncExternalStore` (bebas lint set-state-in-effect)
+- ✅ Share hasil via WhatsApp (`buildRoiWhatsAppMessage`)
+- ✅ Prefill otomatis dari query params (capacity, electricityKwh, waterM3, machinePrice, pricePerKg)
+- ✅ Tombol "Hitung Simulasi ROI" di card Estimasi ROI halaman detail produk
+- ✅ Navbar link "Simulasi ROI" (gap `gap-4 xl:gap-6`, teks search `hidden xl:inline`) + footer quick link
+- ⏭️ PDF export di-skip (keputusan: WhatsApp share cukup)
 
-**Files to Modify:**
-- [ ] `src/components/public/roi-calculator.tsx`
-- [ ] `src/lib/utils.ts`
-- [ ] `src/components/layout/navbar.tsx` (add nav link)
-- [ ] `src/components/layout/footer.tsx` (add footer link)
+**Files Created:**
+- ✅ `src/app/(public)/kalkulator/page.tsx`
+- ✅ `src/components/public/roi-chart.tsx`
+- ✅ `src/components/public/roi-scenario-compare.tsx`
+
+**Files Modified:**
+- ✅ `src/components/public/roi-calculator.tsx` (rewrite)
+- ✅ `src/lib/utils.ts` (upgrade calculateROI + helper localStorage/WA)
+- ✅ `src/components/layout/navbar.tsx` (add nav link)
+- ✅ `src/components/layout/footer.tsx` (add footer link)
+- ✅ `src/app/(public)/produk/[slug]/page.tsx` (tombol Hitung Simulasi ROI)
 
 **Firestore Collections:** None (client-side only)
 
@@ -517,6 +627,13 @@ caseStudies (collection)
 | 25 Aug 2026 | Plan mode untuk 8 fitur | Butuh perencanaan matang sebelum eksekusi |
 | 25 Aug 2026 | Phase-based approach | Memudahkan tracking dan testing |
 | 25 Aug 2026 | Client-side filtering untuk produk | Lebih cepat, tidak perlu query Firestore berulang |
+| 31 Aug 2026 | Firestore/Storage rules diperbaiki untuk review | Customer butuh akses anonim untuk validasi token & upload foto |
+| 31 Aug 2026 | Sparepart pakai collection terpisah dari products | Data & skema berbeda, manajemen independen |
+| 31 Aug 2026 | FAQ Terkait sparepart dihitung otomatis (keyword match) | Tanpa kerja admin, langsung jalan untuk semua sparepart |
+| 31 Aug 2026 | Produk Lainnya = campuran produk + sparepart | Navigasi silang, biar jelas mana produk mana sparepart |
+| 31 Aug 2026 | Label navbar "Simulasi ROI" dipakai untuk fitur kalkulator | Lebih jelas maksudnya untuk calon pembeli |
+| 31 Aug 2026 | Chart ROI pakai custom SVG (tanpa library) + simpan skenario di localStorage | Ringan, tanpa dependency tambahan; skenario maks 5 |
+| 31 Aug 2026 | PDF export ROI di-skip | Whatsapp share dianggap cukup untuk konversi |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
@@ -524,6 +641,8 @@ caseStudies (collection)
 - Firebase Storage untuk semua file uploads (PDF, images)
 - LocalStorage untuk client-side preferences (dark mode, comparison, calculator results)
 - Context API untuk shared state (theme, comparison)
+- FAQ Terkait sparepart memakai keyword matching (nama + kategori) dengan fallback kategori `teknis`
+- Skenario ROI (localStorage) dibaca/react dengan `useSyncExternalStore` (getServerSnapshot untuk SSR) — pola idiomatik, bebas lint `set-state-in-effect`
 
 ---
 
@@ -547,19 +666,25 @@ caseStudies (collection)
 
 ## Progress Summary
 
-| Phase | Fitur | Status | Progress |
-|-------|-------|--------|----------|
-| **Phase 1** | Kalkulator ROI Enhanced | ⏳ PENDING | 0% |
-| **Phase 1** | Product Comparison | ⏳ PENDING | 0% |
-| **Phase 2** | WhatsApp Chat Widget |  PENDING | 0% |
-| **Phase 2** | Advanced Filter | ⏳ PENDING | 0% |
-| **Phase 3** | Downloadable Catalog | ⏳ PENDING | 0% |
-| **Phase 3** | Newsletter | ⏳ PENDING | 0% |
-| **Phase 4** | Case Studies |  PENDING | 0% |
-| **Phase 4** | Dark Mode | ⏳ PENDING | 0% |
+| Phase | Fitur | Status |
+|-------|-------|--------|
+| Bonus | Produk Terkait + Produk Lainnya (halaman produk) | ✅ SELESAI |
+| Phase 2 | Advanced Filter & Search | ✅ SELESAI |
+| Phase 2.5 | Responsive Filter Layout | ✅ SELESAI |
+| Sparepart | Sistem Sparepart (CRUD + publik + SEO) | ✅ SELESAI |
+| Review | System Review Pelanggan | ✅ SELESAI |
+| Branding | Branding & SEO Meta | ✅ SELESAI |
+| Sparepart | Enhancements Detail Sparepart | ✅ SELESAI |
+| Phase 1 | Kalkulator ROI Enhanced | ✅ SELESAI |
+| Phase 1 | Product Comparison | ⏳ PENDING |
+| Phase 2 | WhatsApp Chat Widget | ⏳ PENDING |
+| Phase 3 | Downloadable Catalog | ⏳ PENDING |
+| Phase 3 | Newsletter | ⏳ PENDING |
+| Phase 4 | Case Studies | ⏳ PENDING |
+| Phase 4 | Dark Mode | ⏳ PENDING |
 
-**Overall Progress:** 0% (0/8 fitur selesai)
+**Overall Progress:** 57% (8/14 fitur selesai)
 
 ---
 
-*Last Updated: 25 Agustus 2026*
+*Last Updated: 31 Agustus 2026*

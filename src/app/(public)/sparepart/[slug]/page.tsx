@@ -1,18 +1,32 @@
-import { getSparepartBySlug } from "@/lib/firestore/spareparts";
+import { getSparepartBySlug, getSpareparts } from "@/lib/firestore/spareparts";
 import { getProducts } from "@/lib/firestore/products";
+import { getRelatedFaqs } from "@/lib/firestore/faqs";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 import Link from "next/link";
 import { ArrowLeft, Phone, ChevronLeft, ChevronRight, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ProductGallery } from "@/components/public/product-gallery";
+import { ShareButton } from "@/components/shared/share-button";
+import { FaqAccordion } from "@/components/public/faq-accordion";
 import type { Metadata } from "next";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+interface MixItem {
+  kind: "produk" | "sparepart";
+  id: string;
+  name: string;
+  slug: string;
+  category: string;
+  thumbnail: string;
+  priceText: string;
+  stock: string;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -136,8 +150,35 @@ export default async function SparepartDetailPage({ params }: PageProps) {
   );
 
   const allProducts = await getProducts({ isActive: true });
-  const relatedProducts = allProducts.filter((p) => p.isFeatured).slice(0, 4);
-  const otherProducts = allProducts.filter((p) => !p.isFeatured).slice(0, 4);
+  const allSpareparts = await getSpareparts({ isActive: true });
+  const relatedProducts = allProducts.filter((p) => p.isFeatured).slice(0, 6);
+  const mixItems: MixItem[] = [
+    ...allProducts
+      .filter((p) => !p.isFeatured)
+      .map((p) => ({
+        kind: "produk" as const,
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        category: p.category,
+        thumbnail: p.thumbnail,
+        priceText: p.priceDisplay,
+        stock: p.stock,
+      })),
+    ...allSpareparts
+      .filter((s) => s.id !== sparepart.id)
+      .map((s) => ({
+        kind: "sparepart" as const,
+        id: s.id,
+        name: s.name,
+        slug: s.slug,
+        category: s.category,
+        thumbnail: s.thumbnail,
+        priceText: `Rp ${s.price.toLocaleString("id-ID")}`,
+        stock: s.stock,
+      })),
+  ].slice(0, 6);
+  const relatedFaqs = await getRelatedFaqs([sparepart.name, sparepart.category], 5);
 
   return (
     <>
@@ -212,7 +253,7 @@ export default async function SparepartDetailPage({ params }: PageProps) {
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-2">Deskripsi</h2>
                 <p className="text-gray-600 whitespace-pre-line">
-                  {sparepart.description}
+                  {sparepart.shortDescription || sparepart.description}
                 </p>
               </div>
 
@@ -225,6 +266,52 @@ export default async function SparepartDetailPage({ params }: PageProps) {
                 <Phone className="w-5 h-5" />
                 Pesan via WhatsApp
               </a>
+
+              <div className="flex items-center justify-between mt-4">
+                <ShareButton
+                  title={sparepart.name}
+                  message={[
+                    `🧊 ${sparepart.name}`,
+                    `💰 Rp ${sparepart.price.toLocaleString("id-ID")}`,
+                    `🔧 Kategori: ${sparepart.category}`,
+                  ].join("\n")}
+                  imageUrl={sparepart.thumbnail}
+                />
+                <span className="text-xs text-gray-400">ID: {sparepart.slug}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Full Description */}
+          <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Deskripsi</h2>
+                  <div className="prose prose-gray max-w-none">
+                    <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                      {sparepart.description}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-gray-900 mb-4">FAQ Terkait</h3>
+                  <FaqAccordion faqs={relatedFaqs} />
+                  {relatedFaqs.length > 0 && (
+                    <Link
+                      href="/faq"
+                      className="mt-4 inline-block text-sm text-primary hover:underline"
+                    >
+                      Lihat semua FAQ
+                    </Link>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
 
@@ -234,7 +321,7 @@ export default async function SparepartDetailPage({ params }: PageProps) {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Produk Terkait
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
                 {relatedProducts.map((product) => (
                   <Link key={product.id} href={`/produk/${product.slug}`}>
                     <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
@@ -271,21 +358,24 @@ export default async function SparepartDetailPage({ params }: PageProps) {
           )}
 
           {/* Other Products */}
-          {otherProducts.length > 0 && (
+          {mixItems.length > 0 && (
             <div className="mt-16">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Produk Lainnya
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {otherProducts.map((product) => (
-                  <Link key={product.id} href={`/produk/${product.slug}`}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
+                {mixItems.map((item) => (
+                  <Link
+                    key={`${item.kind}-${item.id}`}
+                    href={item.kind === "produk" ? `/produk/${item.slug}` : `/sparepart/${item.slug}`}
+                  >
                     <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
                       <div className="aspect-square bg-gray-100 relative">
-                        {product.thumbnail ? (
+                        {item.thumbnail ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={product.thumbnail}
-                            alt={product.name}
+                            src={item.thumbnail}
+                            alt={item.name}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -293,16 +383,28 @@ export default async function SparepartDetailPage({ params }: PageProps) {
                             <Package className="w-8 h-8" />
                           </div>
                         )}
+                        <div className="absolute top-2 right-2">
+                          <Badge className={item.stock === "tersedia" ? "bg-green-500 text-white" : item.stock === "indent" ? "bg-yellow-500 text-white" : "bg-red-500 text-white"}>
+                            {item.stock}
+                          </Badge>
+                        </div>
                       </div>
                       <div className="p-4 flex-1 flex flex-col">
-                        <Badge className="bg-blue-100 text-blue-800 w-fit mb-2">
-                          {product.category}
-                        </Badge>
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <Badge className="bg-blue-100 text-blue-800 w-fit truncate">
+                            {item.category}
+                          </Badge>
+                          {item.kind === "sparepart" && (
+                            <span className="text-[10px] uppercase tracking-wide text-gray-400 shrink-0">
+                              Sparepart
+                            </span>
+                          )}
+                        </div>
                         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                          {product.name}
+                          {item.name}
                         </h3>
                         <p className="text-lg font-bold text-primary">
-                          {product.priceDisplay}
+                          {item.priceText}
                         </p>
                       </div>
                     </Card>

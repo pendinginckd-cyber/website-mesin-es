@@ -24,6 +24,7 @@ const navLinks = [
   { href: "/galeri", label: "Galeri" },
   { href: "/tentang", label: "Tentang" },
   { href: "/kontak", label: "Kontak" },
+  { href: "/kalkulator", label: "Simulasi ROI" },
 ];
 
 export function Navbar() {
@@ -112,7 +113,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
-      <nav className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 relative">
+      <nav className="w-full px-3 sm:px-5 lg:px-6 2xl:px-8 relative">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Title (Mobile: truncated) */}
           <Link href="/" className="flex items-center gap-1 shrink-0">
@@ -126,11 +127,11 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-2 mx-4 relative" ref={dropdownRef}>
             <button
               onClick={handleSearchClick}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-gray-600 hover:text-primary max-w-xs"
+              className="flex items-center gap-2 px-3 xl:px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-gray-600 hover:text-primary max-w-xs"
               aria-label="Cari"
             >
               <Search className="w-4 h-4" />
-              <span className="text-sm">Cari disini...</span>
+              <span className="text-sm hidden xl:inline">Cari disini...</span>
             </button>
 
             {/* Search Dropdown */}
@@ -147,12 +148,12 @@ export function Navbar() {
           </div>
 
           {/* Nav Links (Desktop) */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-3 xl:gap-5 2xl:gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-gray-600 hover:text-primary transition-colors text-sm font-medium"
+                className="text-gray-600 hover:text-primary transition-colors text-sm font-medium whitespace-nowrap"
               >
                 {link.label}
               </Link>
@@ -163,19 +164,19 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             <Link
               href="/admin/login"
-              className="flex items-center gap-2 border border-gray-300 hover:border-primary text-gray-700 hover:text-primary px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+              className="flex items-center gap-2 border border-gray-300 hover:border-primary text-gray-700 hover:text-primary px-2.5 xl:px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap"
             >
               <LogIn className="w-4 h-4" />
-              Masuk
+              <span className="hidden xl:inline">Masuk</span>
             </Link>
             <a
               href={`https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+              className="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white px-2.5 xl:px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap"
             >
               <Phone className="w-4 h-4" />
-              Hubungi Kami
+              <span className="hidden xl:inline">Hubungi Kami</span>
             </a>
           </div>
 
