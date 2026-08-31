@@ -165,10 +165,6 @@ export const SPEC_CATEGORIES: SpecCategoryDef[] = [
   },
 ];
 
-export const FALLBACK_CATEGORY_ID = "lainnya";
-
-export const FALLBACK_CATEGORY_TITLE = "Spesifikasi Lainnya";
-
 export function sortSpecificationsByCategory(
   specs: Specification[]
 ): Specification[] {
@@ -185,12 +181,11 @@ export function groupSpecificationsByCategory(
 ): { category: string; title: string; items: Specification[] }[] {
   const grouped = new Map<string, Specification[]>();
   for (const spec of specs) {
-    const key =
-      spec.category && SPEC_CATEGORIES.some((c) => c.id === spec.category)
-        ? spec.category
-        : FALLBACK_CATEGORY_ID;
-    if (!grouped.has(key)) grouped.set(key, []);
-    grouped.get(key)!.push(spec);
+    if (!spec.category || !SPEC_CATEGORIES.some((c) => c.id === spec.category)) {
+      continue;
+    }
+    if (!grouped.has(spec.category)) grouped.set(spec.category, []);
+    grouped.get(spec.category)!.push(spec);
   }
   const result: { category: string; title: string; items: Specification[] }[] =
     [];
@@ -198,13 +193,6 @@ export function groupSpecificationsByCategory(
     if (grouped.has(cat.id)) {
       result.push({ category: cat.id, title: cat.title, items: grouped.get(cat.id)! });
     }
-  }
-  if (grouped.has(FALLBACK_CATEGORY_ID)) {
-    result.push({
-      category: FALLBACK_CATEGORY_ID,
-      title: FALLBACK_CATEGORY_TITLE,
-      items: grouped.get(FALLBACK_CATEGORY_ID)!,
-    });
   }
   return result;
 }

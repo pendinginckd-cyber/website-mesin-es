@@ -2,10 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Specification } from "@/types/product";
-import {
-  groupSpecificationsByCategory,
-  FALLBACK_CATEGORY_TITLE,
-} from "@/lib/product-specs";
+import { groupSpecificationsByCategory } from "@/lib/product-specs";
 
 const VISIBLE_LIMIT = 12;
 
@@ -31,9 +28,7 @@ export function ProductSpecsTable({ specifications }: ProductSpecsTableProps) {
         if (items.length === 0) return null;
         return (
           <div key={group.category} className="mb-6 last:mb-0">
-            <h3 className="text-sm font-bold text-primary mb-2">
-              {group.title === FALLBACK_CATEGORY_TITLE ? "Spesifikasi Lainnya" : group.title}
-            </h3>
+            <h3 className="text-sm font-bold text-primary mb-2">{group.title}</h3>
             <table className="w-full">
               <tbody>
                 {items.map((spec, idx) => (
