@@ -8,6 +8,9 @@ import { ImageUpload } from "@/components/ui/image-upload";
 import { ChevronDown, ChevronUp, Plus, Trash2, Edit2 } from "lucide-react";
 import { getProducts, createProduct, updateProduct, deleteProduct } from "@/lib/firestore/products";
 import { Product, Specification } from "@/types/product";
+import { SPEC_CATEGORIES } from "@/lib/product-specs";
+
+const SPEC_CATEGORY_FIELDS = SPEC_CATEGORIES.flatMap((c) => c.fields);
 
 interface ProductFormData {
   name: string;
@@ -53,7 +56,7 @@ const initialFormData: ProductFormData = {
   category: "kecil",
   isActive: true,
   isFeatured: false,
-  specifications: [{ label: "", value: "" }],
+  specifications: [],
   certifications: [],
   videoUrl: "",
   images: [],
@@ -121,6 +124,7 @@ export default function ProdukAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProductFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
+  const [openSpecCategory, setOpenSpecCategory] = useState<string[]>(SPEC_CATEGORIES.map((c) => c.id));
 
   useEffect(() => {
     fetchProducts();
@@ -141,27 +145,71 @@ export default function ProdukAdmin() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSpecificationChange(index: number, field: "label" | "value", value: string) {
+  function getSpecValue(category: string, label: string): string {
+    return (
+      formData.specifications.find((s) => s.category === category && s.label === label)
+        ?.value ?? ""
+    );
+  }
+
+  function handleSpecValueChange(category: string, label: string, value: string) {
+    setFormData((prev) => {
+      const specs = prev.specifications.filter(
+        (s) => !(s.category === category && s.label === label)
+      );
+      if (value.trim() !== "") {
+        specs.push({ category, label, value });
+      }
+      return { ...prev, specifications: specs };
+    });
+  }
+
+  function getExtraSpecs(category: string): Specification[] {
+    return formData.specifications.filter(
+      (s) => s.category === category && !SPEC_CATEGORY_FIELDS.some((f) => f.label === s.label)
+    );
+  }
+
+  function addExtraSpec(category: string) {
     setFormData((prev) => ({
       ...prev,
-      specifications: prev.specifications.map((spec, i) =>
-        i === index ? { ...spec, [field]: value } : spec
-      ),
+      specifications: [
+        ...prev.specifications,
+        { category, label: "", value: "" },
+      ],
     }));
   }
 
-  function addSpecification() {
-    setFormData((prev) => ({
-      ...prev,
-      specifications: [...prev.specifications, { label: "", value: "" }],
-    }));
+  function handleExtraSpecChange(
+    category: string,
+    index: number,
+    field: "label" | "value",
+    value: string
+  ) {
+    setFormData((prev) => {
+      const extras = prev.specifications.filter(
+        (s) => s.category === category && !SPEC_CATEGORY_FIELDS.some((f) => f.label === s.label)
+      );
+      extras[index] = { ...extras[index], [field]: value };
+      const nonExtras = prev.specifications.filter(
+        (s) => !(s.category === category && !SPEC_CATEGORY_FIELDS.some((f) => f.label === s.label))
+      );
+      const cleaned = extras.filter((s) => s.label.trim() !== "" && s.value.trim() !== "");
+      return { ...prev, specifications: [...nonExtras, ...cleaned] };
+    });
   }
 
-  function removeSpecification(index: number) {
-    setFormData((prev) => ({
-      ...prev,
-      specifications: prev.specifications.filter((_, i) => i !== index),
-    }));
+  function removeExtraSpec(category: string, index: number) {
+    setFormData((prev) => {
+      const extras = prev.specifications.filter(
+        (s) => s.category === category && !SPEC_CATEGORY_FIELDS.some((f) => f.label === s.label)
+      );
+      const target = extras[index];
+      return {
+        ...prev,
+        specifications: prev.specifications.filter((s) => s !== target),
+      };
+    });
   }
 
   function handleCertificationsChange(value: string) {
@@ -206,7 +254,7 @@ export default function ProdukAdmin() {
       category: (product.category as string) || "kecil",
       isActive: product.isActive ?? true,
       isFeatured: product.isFeatured ?? false,
-      specifications: product.specifications?.length ? product.specifications : [{ label: "", value: "" }],
+      specifications: product.specifications?.length ? product.specifications : [],
       certifications: product.certifications || [],
       videoUrl: product.videoUrl || "",
       images: product.images?.length ? product.images : [],
@@ -396,36 +444,71 @@ export default function ProdukAdmin() {
               </div>
 
               <div>
-                <Label>Spesifikasi</Label>
-                <div className="space-y-2">
-                  {formData.specifications.map((spec, i) => (
-                    <div key={i} className="flex gap-2 items-start">
-                      <input
-                        type="text"
-                        value={spec.label}
-                        onChange={(e) => handleSpecificationChange(i, "label", e.target.value)}
-                        placeholder="Label (cth: Daya Listrik)"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                      />
-                      <input
-                        type="text"
-                        value={spec.value}
-                        onChange={(e) => handleSpecificationChange(i, "value", e.target.value)}
-                        placeholder="Value (cth: 2200 Watt)"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                      />
-                      {formData.specifications.length > 1 && (
-                        <Button type="button" variant="ghost" size="sm" onClick={() => removeSpecification(i)} className="mt-1 text-red-500">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  {formData.specifications.length < 6 && (
-                    <Button type="button" variant="outline" size="sm" onClick={addSpecification}>
-                      <Plus className="w-4 h-4 mr-1" /> Tambah Spec
-                    </Button>
-                  )}
+                <Label>Spesifikasi Teknis</Label>
+                <div className="space-y-3">
+                  {SPEC_CATEGORIES.map((cat) => {
+                    const isOpen = openSpecCategory.includes(cat.id);
+                    const extraSpecs = getExtraSpecs(cat.id);
+                    return (
+                      <div key={cat.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOpenSpecCategory((prev) =>
+                              isOpen
+                                ? prev.filter((id) => id !== cat.id)
+                                : [...prev, cat.id]
+                            )
+                          }
+                          className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 text-left"
+                        >
+                          <span className="font-medium text-gray-900">{cat.title}</span>
+                          {isOpen ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+                        </button>
+                        {isOpen && (
+                          <div className="p-3 space-y-3">
+                            <p className="text-xs text-gray-500">{cat.description}</p>
+                            {cat.fields.map((field) => (
+                              <div key={field.label}>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">{field.label}</label>
+                                <input
+                                  type="text"
+                                  value={getSpecValue(cat.id, field.label)}
+                                  onChange={(e) => handleSpecValueChange(cat.id, field.label, e.target.value)}
+                                  placeholder={field.placeholder}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                />
+                              </div>
+                            ))}
+                            {extraSpecs.map((spec, i) => (
+                              <div key={`${cat.id}-extra-${i}`} className="flex gap-2 items-start">
+                                <input
+                                  type="text"
+                                  value={spec.label}
+                                  onChange={(e) => handleExtraSpecChange(cat.id, i, "label", e.target.value)}
+                                  placeholder="Label tambahan"
+                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                />
+                                <input
+                                  type="text"
+                                  value={spec.value}
+                                  onChange={(e) => handleExtraSpecChange(cat.id, i, "value", e.target.value)}
+                                  placeholder="Value"
+                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                />
+                                <Button type="button" variant="ghost" size="sm" onClick={() => removeExtraSpec(cat.id, i)} className="mt-1 text-red-500">
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ))}
+                            <Button type="button" variant="outline" size="sm" onClick={() => addExtraSpec(cat.id)}>
+                              <Plus className="w-4 h-4 mr-1" /> Tambah Spec
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 

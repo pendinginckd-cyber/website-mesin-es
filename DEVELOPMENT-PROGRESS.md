@@ -656,6 +656,7 @@ caseStudies (collection)
 | 31 Aug 2026 | Build pakai webpack (`next build --webpack`) + `.browserslistrc` (Safari/iOS >=15); hapus framer-motion; `optimizePackageImports` | Turbopack tidak mentranspile node_modules ke baseline lalu JS output Next 16 gagal di iOS 15 (blank/hydration mati). Webpack ber-respect browserslist & downlevel deps; framer-motion mati (tak terpakai) |
 | 31 Aug 2026 | PDF katalog pakai jsPDF + jspdf-autotable di browser | Selalu sinkron dgn produk aktif; tanpa server PDF generation; download counter di-skip |
 | 31 Aug 2026 | Fitur Katalog (halaman + PDF) DILEPAS setelah review hasil | Hasil tidak sesuai keinginan user; deps jspdf di-uninstall, halaman/links di-rollback |
+| 31 Aug 2026 | Spesifikasi produk distrukturkan jadi 6 kategori (`Specification.category?`; form admin accordion per kategori; tambah field bebas per kategori; display publik dikelompokkan + tombol "Lihat Lebih Banyak" bila >12 baris) | Skema standar mesin es kristal agar mudah dibaca calon pembeli; `category` optional agar data lama tetap tampil di grup "Spesifikasi Lainnya" tanpa migrasi |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO

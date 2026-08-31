@@ -4,8 +4,8 @@ import Link from "next/link";
 import { ArrowLeft, CheckCircle, Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Specification } from "@/types/product";
 import { ProductGallery } from "@/components/public/product-gallery";
+import { ProductSpecsTable } from "@/components/public/product-specs-table";
 import { ProductCta } from "@/components/public/product-cta";
 import { ShareButton } from "@/components/shared/share-button";
 import { ProductRelatedSection } from "@/components/public/product-related-section";
@@ -290,16 +290,7 @@ export default async function ProdukDetailPage({ params }: PageProps) {
             <Card>
               <CardContent className="p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Spesifikasi Teknis</h2>
-                <table className="w-full">
-                  <tbody>
-                    {product.specifications.map((spec: Specification, idx: number) => (
-                      <tr key={idx} className={idx !== 0 ? "border-t border-gray-100" : ""}>
-                        <td className="py-3 pr-4 text-gray-500 w-1/3">{spec.label}</td>
-                        <td className="py-3 font-medium text-gray-900">{spec.value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <ProductSpecsTable specifications={product.specifications} />
               </CardContent>
             </Card>
           </div>

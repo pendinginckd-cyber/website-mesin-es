@@ -1,6 +1,7 @@
 export interface Specification {
   label: string;
   value: string;
+  category?: string;
 }
 
 export interface RoiEstimation {
