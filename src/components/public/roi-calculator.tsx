@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Calculator, Info, Share2, Save } from "lucide-react";
-import { formatCurrency, calculateROI, saveRoiScenario, loadRoiScenarios, buildRoiWhatsAppMessage } from "@/lib/utils";
+import { formatCurrency, calculateROI, saveRoiScenario, loadRoiScenarios, buildRoiWhatsAppMessage, formatNumericInput, formatNumericAppDisplay } from "@/lib/utils";
 import { ROIChart } from "@/components/public/roi-chart";
 import { useContact } from "@/contexts/contact-context";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
@@ -34,7 +34,7 @@ export function ROICalculator({
   pricePerKg = 3000,
 }: ROICalculatorProps) {
   const { contact } = useContact();
-  const [inputs, setInputs] = useState<RoiInputs>({
+  const initialInputs = {
     capacityKg,
     pricePerKg,
     electricityRate: 1444,
@@ -43,16 +43,26 @@ export function ROICalculator({
     waterM3,
     machinePrice,
     dailyOperationalCost: 0,
-  });
+  } satisfies RoiInputs;
+  const [inputs, setInputs] = useState<RoiInputs>(initialInputs);
+  const [display, setDisplay] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      Object.entries(initialInputs).map(([k, v]) => [
+        k,
+        formatNumericAppDisplay(v),
+      ])
+    )
+  );
   const [saved, setSaved] = useState(false);
 
   const result = calculateROI(inputs);
   const waNumber = contact?.whatsappNumber || WHATSAPP_NUMBER;
   const waMessage = encodeURIComponent(buildRoiWhatsAppMessage(inputs, result));
 
-  function handleChange(field: string, value: string) {
-    const num = parseFloat(value) || 0;
-    setInputs((prev) => ({ ...prev, [field]: num }));
+  function handleChange(field: string, raw: string) {
+    const { display: displayValue, value } = formatNumericInput(raw);
+    setDisplay((prev) => ({ ...prev, [field]: displayValue }));
+    setInputs((prev) => ({ ...prev, [field]: value }));
   }
 
   function handleSaveScenario() {
@@ -66,17 +76,16 @@ export function ROICalculator({
   function inputField(
     name: string,
     label: string,
-    value: number,
-    step?: string,
+    inputMode: "numeric" | "decimal" = "decimal",
     helper?: string
   ) {
     return (
       <div>
         <label className="block text-xs text-gray-500 mb-1">{label}</label>
         <input
-          type="number"
-          step={step || "any"}
-          value={value}
+          type="text"
+          inputMode={inputMode}
+          value={display[name] ?? ""}
           onChange={(e) => handleChange(name, e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
@@ -98,19 +107,18 @@ export function ROICalculator({
         <div className="space-y-4">
           <h3 className="text-sm font-medium text-gray-700">Input</h3>
 
-          {inputField("capacityKg", "Kapasitas Mesin (kg/hari)", inputs.capacityKg)}
-          {inputField("pricePerKg", "Harga Jual Es (Rp/kg)", inputs.pricePerKg, "100")}
-          {inputField("machinePrice", "Harga Mesin (Rp)", inputs.machinePrice, "1000000")}
+          {inputField("capacityKg", "Kapasitas Mesin (kg/hari)", "numeric")}
+          {inputField("pricePerKg", "Harga Jual Es (Rp/kg)", "numeric")}
+          {inputField("machinePrice", "Harga Mesin (Rp)", "numeric")}
           <div className="border-t border-gray-100 pt-4 space-y-4">
-            {inputField("electricityRate", "Biaya Listrik (Rp/kWh)", inputs.electricityRate, "50")}
-            {inputField("electricityKwh", "Konsumsi Listrik (kWh/hari)", inputs.electricityKwh, "0.1")}
-            {inputField("waterRate", "Biaya Air (Rp/m3)", inputs.waterRate, "100")}
-            {inputField("waterM3", "Konsumsi Air (m3/hari)", inputs.waterM3, "0.1")}
+            {inputField("electricityRate", "Biaya Listrik (Rp/kWh)", "decimal")}
+            {inputField("electricityKwh", "Konsumsi Listrik (kWh/hari)", "decimal")}
+            {inputField("waterRate", "Biaya Air (Rp/m3)", "decimal")}
+            {inputField("waterM3", "Konsumsi Air (m3/hari)", "decimal")}
             {inputField(
               "dailyOperationalCost",
               "Biaya Operasional Tambahan (Rp/hari)",
-              inputs.dailyOperationalCost,
-              "10000",
+              "numeric",
               "Contoh: gaji karyawan, sewa tempat, kemasan, distribusi."
             )}
           </div>

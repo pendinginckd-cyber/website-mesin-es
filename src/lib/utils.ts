@@ -7,6 +7,25 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+export function formatNumericAppDisplay(value: number): string {
+  if (typeof value !== "number" || !isFinite(value)) return "0";
+  return new Intl.NumberFormat("id-ID").format(value);
+}
+
+export function formatNumericInput(raw: string): { display: string; value: number } {
+  const t = raw.replace(/[^0-9,]/g, "");
+  if (t === "") return { display: "", value: 0 };
+  const commaIndex = t.indexOf(",");
+  const intPartRaw = commaIndex === -1 ? t : t.slice(0, commaIndex);
+  const decPart = commaIndex === -1 ? "" : t.slice(commaIndex + 1).replace(/,/g, "");
+  let intPart = intPartRaw.replace(/^0+(?=\d)/, "");
+  if (intPart === "") intPart = "0";
+  const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const display = grouped + (commaIndex === -1 ? "" : "," + decPart);
+  const value = parseFloat(decPart === "" ? intPart : `${intPart}.${decPart}`);
+  return { display, value };
+}
+
 export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
