@@ -2,8 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['localhost', '192.168.1.12', '192.168.1.17', '192.168.1.*'],
-  turbopack: {},
   assetPrefix: '',
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'zod', 'react-hook-form', 'rc-slider'],
+  },
   images: {
     remotePatterns: [
       {
