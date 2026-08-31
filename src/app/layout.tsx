@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import ServiceWorkerRegister from "@/components/pwa/service-worker-register";
 import "./globals.css";
 
 const inter = Inter({
@@ -51,10 +52,16 @@ export const metadata: Metadata = {
     images: ["/icon.png"],
   },
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "Mesin Es Kristal",
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
+  themeColor: "#0284c7",
 };
 
 export default function RootLayout({
@@ -65,6 +72,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${inter.variable} font-sans antialiased`}>
       <body className="min-h-screen flex flex-col bg-white text-gray-900">
+        <ServiceWorkerRegister />
         {children}
       </body>
     </html>

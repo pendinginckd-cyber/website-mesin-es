@@ -194,6 +194,27 @@
 
 ---
 
+## ✅ Feature: PWA Installable (COMPLETED)
+
+**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026
+
+**Description:** Situs kini memenuhi kriteria PWA Chrome/Android → ikon instalasi ("Instal Aplikasi") aktif otomatis dari menu browser (tanpa tombol kustom, offline minimal & aman).
+
+**Features Implemented:**
+- ✅ Ikon PWA asli 192×192, 512×512, maskable-512x512 (logo EKN, safe-zone 55%), + 180×180 iOS
+- ✅ `manifest.json` valid: `id:"/"`, `scope:"/"`, ikon ukuran benar, `theme_color` #0284c7
+- ✅ Service worker `/sw.js`: cache-first aset statis (nama ber-hash), network-first navigasi; tanpa cache admin/API
+- ✅ Registrasi SW client (production-only) + `appleWebApp` & `theme-color` untuk standalone iOS/Android
+
+**Files Modified:**
+- ✅ `public/icons/icon-192x192.png`, `icon-512x512.png`, `maskable-512x512.png`, `icon-180x180.png`
+- ✅ `public/manifest.json`
+- ✅ `public/sw.js`
+- ✅ `src/components/pwa/service-worker-register.tsx`
+- ✅ `src/app/layout.tsx`
+
+---
+
 ## ✅ Feature: Enhancements Detail Sparepart (COMPLETED)
 
 **Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026
