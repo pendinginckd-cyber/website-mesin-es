@@ -21,10 +21,6 @@ const STATIC_ASSET_EXTENSIONS = [
   ".ico",
 ];
 
-self.addEventListener("install", (event) => {
-  self.skipWaiting();
-});
-
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
@@ -32,7 +28,6 @@ self.addEventListener("activate", (event) => {
       await Promise.all(
         keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))
       );
-      await self.clients.claim();
     })()
   );
 });
