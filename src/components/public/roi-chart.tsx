@@ -35,7 +35,6 @@ export function ROIChart({ result }: { result: ReturnType<typeof calculateROI> }
   const revenue = result.monthlyRevenue;
   const cost = result.monthlyCost;
   const profit = result.monthlyProfit;
-  const splitWidth = revenue > 0 ? chartWidth : 0;
   const costRatio = revenue > 0 ? Math.min(cost / revenue, 1) : 1;
   const profitRatio = revenue > 0 && profit > 0 ? Math.min(profit / revenue, 1 - costRatio) : 0;
 
@@ -48,7 +47,7 @@ export function ROIChart({ result }: { result: ReturnType<typeof calculateROI> }
             <span>Pendapatan Bulanan</span>
             <span className="font-medium text-gray-900">{compactRupiah(revenue)}</span>
           </div>
-          <div className="flex h-6 w-full rounded-lg overflow-hidden border border-gray-200" style={{ width: splitWidth }}>
+          <div className="flex h-6 w-full rounded-lg overflow-hidden border border-gray-200">
             <div
               className="bg-red-500"
               style={{ width: `${Math.max(costRatio * 100, 0)}%` }}
