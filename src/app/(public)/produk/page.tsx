@@ -3,8 +3,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { X } from "lucide-react";
-import Link from "next/link";
-import { FileDown } from "lucide-react";
 import { searchProducts } from "@/lib/firestore/products";
 import { ProdukGrid } from "@/components/public/produk-grid";
 import { Product } from "@/types/product";
@@ -47,16 +45,9 @@ function ProdukPageContent() {
           <h1 className="text-4xl font-bold text-blue-900 mb-4">
             Katalog Mesin Es Kristal
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Pilihan mesin es kristal berkualitas untuk kebutuhan usaha Anda.
           </p>
-          <Link
-            href="/katalog"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg font-semibold transition-colors tap-effect"
-          >
-            <FileDown className="w-4 h-4" />
-            Lihat Katalog Lengkap
-          </Link>
         </div>
 
         {/* Active Search Chip */}

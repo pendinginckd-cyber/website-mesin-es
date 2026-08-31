@@ -351,36 +351,28 @@
 
 ## Phase 3: Downloadable Catalog + Newsletter
 
-### ✅ Fitur 5: Downloadable Catalog/Brochure
-**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026 | **Priority:** MEDIUM
+### 🌤️ Fitur 5: Downloadable Catalog/Brochure — DILEPAS
+**Status:** ❌ DILEPAS (REVERTED) | **Built:** 31 Agustus 2026 | **Dilepas:** 31 Agustus 2026
 
-**Description:** Katalog produk yang **otomatis ter-update** dari data Firestore + unduhan brosur PDF via jsPDF (generated di browser).
+**Alasan:** Setelah review hasil oleh user, fitur katalog (halaman `/katalog` + PDF brosur jsPDF) **dilepas** karena tidak sesuai keinginan.
 
-**Feature Checklist:**
-- ✅ Katalog online `/katalog` = SSR dari `getProducts({isActive:true})` — otomatis ikut produk yang ditambah/diubah/nonaktif oleh admin (tanpa deploy, tanpa upload manual)
-- ✅ Kelompok per kategori (kecil/menengah/besar), urut by kapasitas
-- ✅ Download **PDF brosur** (jsPDF + jspdf-autotable): cover branding + kontak + tanggal, tabel per kategori [Foto/Mesin/Kapasitas/Daya/Garansi/Stok/Harga], footer nomor halaman; foto thumbnail dimuat dengan fallback bila gagal/CORS
-- ✅ Tombol "Lihat Katalog Lengkap" di halaman `/produk`
-- ✅ Link `/katalog` di footer quick links
-- ✅ SEO: metadata + sitemap entry
-- ⏭️ Admin upload PDF & tracking download di-skip — katalog auto-generated, counter download tidak akurat untuk PDF client-side
+**Apa yang sudah pernah dibangun & kemudian dihapus:**
+- `src/app/(public)/katalog/page.tsx` — katalog online SSR dari `getProducts({isActive:true})`
+- `src/components/public/katalog-view.tsx`
+- `src/lib/katalog/catalog-pdf.ts` — PDF brosur via `jspdf` + `jspdf-autotable`
+- Tombol "Lihat Katalog Lengkap" di `/produk`, link `/katalog` di footer, entry sitemap
 
-**Files Created:**
-- ✅ `src/app/(public)/katalog/page.tsx`
-- ✅ `src/components/public/katalog-view.tsx`
-- ✅ `src/lib/katalog/catalog-pdf.ts`
+**Rollback yang dilakukan:**
+- ✅ Semua file di atas dihapus
+- ✅ `package.json`/`package-lock.json`: `npm uninstall jspdf jspdf-autotable`
+- ✅ footer, `/produk`, `sitemap.ts` dikembalikan
+- ✅ Commit revert + deploy production
 
-**Files Modified:**
-- ✅ `src/components/layout/footer.tsx` (tambah link Katalog)
-- ✅ `src/app/(public)/produk/page.tsx` (tombol Lihat Katalog Lengkap)
-- ✅ `src/app/sitemap.ts` (tambah /katalog)
-- ✅ `package.json` (tambah `jspdf`, `jspdf-autotable`)
-
-**Firestore Collections:** None (membaca `products` yang sudah ada)
+**Firestore Collections:** Tidak ada (fitur baca `products` saja)
 
 ---
 
-### ✅ Fitur 6: Newsletter Subscription
+### Fitur 6: Newsletter Subscription
 **Status:** ⏳ PENDING | **Estimasi:** 1-2 jam | **Priority:** LOW
 
 **Feature Checklist:**
@@ -638,6 +630,7 @@ caseStudies (collection)
 | 31 Aug 2026 | Widget WA tanpa auto-show popup | Auto-popup berisiko mengganggu UX & dianggap spam; hanya muncul saat diklik |
 | 31 Aug 2026 | Katalog diubah jadi auto-generated dari data produk (bukan upload PDF admin) | Permintaan user: katalog otomatis update saat admin menambah produk; tanpa collection/storage baru |
 | 31 Aug 2026 | PDF katalog pakai jsPDF + jspdf-autotable di browser | Selalu sinkron dgn produk aktif; tanpa server PDF generation; download counter di-skip |
+| 31 Aug 2026 | Fitur Katalog (halaman + PDF) DILEPAS setelah review hasil | Hasil tidak sesuai keinginan user; deps jspdf di-uninstall, halaman/links di-rollback |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
@@ -684,12 +677,12 @@ caseStudies (collection)
 | Phase 1 | Kalkulator ROI Enhanced | ✅ SELESAI |
 | Phase 1 | Product Comparison | ✅ SELESAI |
 | Phase 2 | WhatsApp Chat Widget | ✅ SELESAI |
-| Phase 3 | Downloadable Catalog | ✅ SELESAI |
+| Phase 3 | Downloadable Catalog | ❌ DILEPAS (revert) |
 | Phase 3 | Newsletter | ⏳ PENDING |
 | Phase 4 | Case Studies | ⏳ PENDING |
 | Phase 4 | Dark Mode | ⏳ PENDING |
 
-**Overall Progress:** 79% (11/14 fitur selesai)
+**Overall Progress:** 71% (10/14 fitur selesai)
 
 ---
 
