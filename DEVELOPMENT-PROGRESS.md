@@ -289,24 +289,31 @@
 ## Phase 2: WhatsApp Chat Widget + Advanced Filter
 
 ### ✅ Fitur 3: WhatsApp Chat Widget (Embedded)
-**Status:** ⏳ PENDING | **Estimasi:** 1-2 jam | **Priority:** MEDIUM
+**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026 | **Priority:** MEDIUM
 
-**Existing Files:**
-- `src/components/public/floating-whatsapp.tsx` - Simple floating button
+**Description:** Floating WhatsApp Button jadi chat window popup dengan quick replies & branding custom.
 
 **Enhancement Checklist:**
-- [ ] Chat window popup dengan pre-filled message
-- [ ] Custom branding (logo, warna, greeting message)
-- [ ] Quick replies: "Info Produk", "Nego Harga", "Konsultasi"
-- [ ] Smooth open/close animation
-- [ ] Auto-show setelah 30 detik atau scroll 50% (optional)
+- ✅ Chat window popup dengan pre-filled message
+- ✅ Custom branding (logo, warna, greeting dari `contact.whatsappMessage`)
+- ✅ Quick replies: "Info Produk", "Nego Harga", "Konsultasi", "Minta Katalog"
+- ✅ Input teks kustom → buka `wa.me` ber-prefill
+- ✅ Smooth open/close animation (animate-in slide-in-from-bottom)
+- ✅ Tutup saat klik di luar / tombol X; tombol berubah ikon (chat ↔ X)
+- ✅ Mount di **semua halaman publik** via `(public)/layout.tsx` (sebelumnya hanya homepage)
 
-**Files to Create:**
-- [ ] `src/components/public/whatsapp-chat-widget.tsx`
+**Files Created:**
+- ✅ `src/components/public/whatsapp-chat-widget.tsx`
+- ✅ `src/lib/whatsapp-widget.ts` (`buildWhatsAppUrl` + `QUICK_REPLIES`)
 
-**Files to Modify:**
-- [ ] `src/components/public/floating-whatsapp.tsx` (replace with new widget)
-- [ ] `src/app/(public)/layout.tsx` (update import)
+**Files Modified:**
+- ✅ `src/app/(public)/layout.tsx` (mount widget)
+- ✅ `src/app/(public)/page.tsx` (hapus FloatingWhatsApp, pindah ke layout)
+
+**Files Deleted:**
+- ✅ `src/components/public/floating-whatsapp.tsx`
+
+**Keputusan:** Tanpa auto-show popup — panel hanya muncul saat diklik (tidak mengganggu UX / SEO).
 
 **Firestore Collections:** None
 
@@ -638,6 +645,8 @@ caseStudies (collection)
 | 31 Aug 2026 | PDF export ROI di-skip | Whatsapp share dianggap cukup untuk konversi |
 | 31 Aug 2026 | Comparison pakai localStorage `comparison_ids_v1` + `useSyncExternalStore` (tanpa Context Provider) | Pola sama dengan ro pakai idiom yang sama, nyala otomatis di semua halaman (navbar + kartu) |
 | 31 Aug 2026 | `/bandingkan` jadi server component + client component ProductComparison | SEO & data produk langsung dari SSR; state perbandingan tetap di browser |
+| 31 Aug 2026 | WhatsApp Chat Widget dipasang di semua halaman publik (bukan hanya homepage) | Konsisten dengan floating button yang dulu; peluang konversi di semua halaman |
+| 31 Aug 2026 | Widget WA tanpa auto-show popup | Auto-popup berisiko mengganggu UX & dianggap spam; hanya muncul saat diklik |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
@@ -683,13 +692,13 @@ caseStudies (collection)
 | Sparepart | Enhancements Detail Sparepart | ✅ SELESAI |
 | Phase 1 | Kalkulator ROI Enhanced | ✅ SELESAI |
 | Phase 1 | Product Comparison | ✅ SELESAI |
-| Phase 2 | WhatsApp Chat Widget | ⏳ PENDING |
+| Phase 2 | WhatsApp Chat Widget | ✅ SELESAI |
 | Phase 3 | Downloadable Catalog | ⏳ PENDING |
 | Phase 3 | Newsletter | ⏳ PENDING |
 | Phase 4 | Case Studies | ⏳ PENDING |
 | Phase 4 | Dark Mode | ⏳ PENDING |
 
-**Overall Progress:** 64% (9/14 fitur selesai)
+**Overall Progress:** 71% (10/14 fitur selesai)
 
 ---
 

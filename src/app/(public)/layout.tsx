@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ContactProvider } from "@/contexts/contact-context";
 import { BackToTop } from "@/components/public/back-to-top";
+import { WhatsAppChatWidget } from "@/components/public/whatsapp-chat-widget";
 import { VisitorCounter } from "@/components/public/visitor-counter";
 
 export default function PublicLayout({
@@ -19,6 +20,7 @@ export default function PublicLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <BackToTop />
+      <WhatsAppChatWidget />
     </ContactProvider>
   );
 }

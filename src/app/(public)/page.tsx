@@ -5,7 +5,6 @@ import { ProdukGrid } from "@/components/public/produk-grid";
 import { TestimoniReviewSection } from "@/components/public/testimoni-review-section";
 import { FaqSection } from "@/components/public/faq-section";
 import { CTASection } from "@/components/public/cta-section";
-import { FloatingWhatsApp } from "@/components/public/floating-whatsapp";
 import { VisitorStatsDisplay } from "@/components/public/visitor-stats-display";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { getFeaturedProducts, getProducts } from "@/lib/firestore/products";
@@ -67,7 +66,6 @@ export default async function HomePage() {
       <ScrollReveal>
         <CTASection />
       </ScrollReveal>
-      <FloatingWhatsApp />
     </>
   );
 }
