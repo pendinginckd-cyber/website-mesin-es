@@ -657,6 +657,7 @@ caseStudies (collection)
 | 31 Aug 2026 | PDF katalog pakai jsPDF + jspdf-autotable di browser | Selalu sinkron dgn produk aktif; tanpa server PDF generation; download counter di-skip |
 | 31 Aug 2026 | Fitur Katalog (halaman + PDF) DILEPAS setelah review hasil | Hasil tidak sesuai keinginan user; deps jspdf di-uninstall, halaman/links di-rollback |
 | 31 Aug 2026 | Spesifikasi produk distrukturkan jadi 6 kategori (`Specification.category?`; form admin accordion per kategori; tambah field bebas per kategori; display publik dikelompokkan + tombol "Lihat Lebih Banyak" bila >12 baris) | Skema standar mesin es kristal agar mudah dibaca calon pembeli; `category` optional agar data lama tetap tampil di grup "Spesifikasi Lainnya" tanpa migrasi |
+| 31 Aug 2026 | Kartu produk gaya marketplace: gambar 1:1, aksi 1 baris (Nego + ikon Bandingkan), grid full-bleed di HP (`px-0 gap-2`), link "Lihat Spesifikasi" dihapus | Permintaan user: kartu lama terlalu tinggi (3 tombol bertumpuk) & tidak full layar di HP; mengikuti konsep Shopee/Tokopedia |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
