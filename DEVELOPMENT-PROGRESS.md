@@ -651,6 +651,8 @@ caseStudies (collection)
 | 31 Aug 2026 | WhatsApp Chat Widget dipasang di semua halaman publik (bukan hanya homepage) | Konsisten dengan floating button yang dulu; peluang konversi di semua halaman |
 | 31 Aug 2026 | Widget WA tanpa auto-show popup | Auto-popup berisiko mengganggu UX & dianggap spam; hanya muncul saat diklik |
 | 31 Aug 2026 | Katalog diubah jadi auto-generated dari data produk (bukan upload PDF admin) | Permintaan user: katalog otomatis update saat admin menambah produk; tanpa collection/storage baru |
+| 31 Aug 2026 | Tailwind v3.4 menggantikan v4 (`tailwind.config.ts`, direktif `@tailwind`, dll) | Homepage putih polos di iOS 15/WebKit lama: CSS v4 dibungkus `@layer`/@property/color-mix yang dibuang Safari <15.4. v3 kompatibel iOS 12.2+ |
+| 31 Aug 2026 | SW tanpa `skipWaiting()`/`clients.claim()` | Mencegah race blank-load/pertikaian cache saat SW baru mengambil alih halaman yang masih loading di iOS |
 | 31 Aug 2026 | PDF katalog pakai jsPDF + jspdf-autotable di browser | Selalu sinkron dgn produk aktif; tanpa server PDF generation; download counter di-skip |
 | 31 Aug 2026 | Fitur Katalog (halaman + PDF) DILEPAS setelah review hasil | Hasil tidak sesuai keinginan user; deps jspdf di-uninstall, halaman/links di-rollback |
 
