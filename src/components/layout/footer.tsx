@@ -9,6 +9,7 @@ import { VisitorStatsDisplay } from "@/components/public/visitor-stats-display";
 const quickLinks = [
   { href: "/", label: "Beranda" },
   { href: "/produk", label: "Produk" },
+  { href: "/katalog", label: "Katalog" },
   { href: "/sparepart", label: "Sparepart" },
   { href: "/artikel", label: "Artikel" },
   { href: "/faq", label: "FAQ" },

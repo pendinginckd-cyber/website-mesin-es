@@ -352,42 +352,31 @@
 ## Phase 3: Downloadable Catalog + Newsletter
 
 ### ✅ Fitur 5: Downloadable Catalog/Brochure
-**Status:** ⏳ PENDING | **Estimasi:** 1-2 jam | **Priority:** MEDIUM
+**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026 | **Priority:** MEDIUM
+
+**Description:** Katalog produk yang **otomatis ter-update** dari data Firestore + unduhan brosur PDF via jsPDF (generated di browser).
 
 **Feature Checklist:**
-- [ ] Admin upload PDF katalog
-- [ ] Public preview PDF di browser
-- [ ] Download button
-- [ ] Track download count
-- [ ] Support multiple katalog (produk, harga, teknis)
-- [ ] Version control (tanggal update)
+- ✅ Katalog online `/katalog` = SSR dari `getProducts({isActive:true})` — otomatis ikut produk yang ditambah/diubah/nonaktif oleh admin (tanpa deploy, tanpa upload manual)
+- ✅ Kelompok per kategori (kecil/menengah/besar), urut by kapasitas
+- ✅ Download **PDF brosur** (jsPDF + jspdf-autotable): cover branding + kontak + tanggal, tabel per kategori [Foto/Mesin/Kapasitas/Daya/Garansi/Stok/Harga], footer nomor halaman; foto thumbnail dimuat dengan fallback bila gagal/CORS
+- ✅ Tombol "Lihat Katalog Lengkap" di halaman `/produk`
+- ✅ Link `/katalog` di footer quick links
+- ✅ SEO: metadata + sitemap entry
+- ⏭️ Admin upload PDF & tracking download di-skip — katalog auto-generated, counter download tidak akurat untuk PDF client-side
 
-**Files to Create:**
-- [ ] `src/app/(public)/katalog/page.tsx`
-- [ ] `src/app/(admin)/admin/katalog/page.tsx`
-- [ ] `src/lib/firestore/catalogs.ts`
-- [ ] `src/types/catalog.ts`
+**Files Created:**
+- ✅ `src/app/(public)/katalog/page.tsx`
+- ✅ `src/components/public/katalog-view.tsx`
+- ✅ `src/lib/katalog/catalog-pdf.ts`
 
-**Files to Modify:**
-- [ ] `src/components/layout/navbar.tsx` (add nav link)
-- [ ] `src/components/layout/footer.tsx` (add footer link)
-- [ ] `src/components/layout/admin-sidebar.tsx` (add admin menu)
-- [ ] `storage.rules` (add catalogs/ path)
-- [ ] `firestore.rules` (add catalogs collection rules)
+**Files Modified:**
+- ✅ `src/components/layout/footer.tsx` (tambah link Katalog)
+- ✅ `src/app/(public)/produk/page.tsx` (tombol Lihat Katalog Lengkap)
+- ✅ `src/app/sitemap.ts` (tambah /katalog)
+- ✅ `package.json` (tambah `jspdf`, `jspdf-autotable`)
 
-**Firestore Collections:**
-```
-catalogs (collection)
-├── id (auto)
-├── title (string)
-├── description (string)
-├── pdfUrl (string) - Firebase Storage URL
-├── fileSize (number) - in bytes
-├── version (string)
-├── updatedAt (timestamp)
-├── isActive (boolean)
-└── downloadCount (number)
-```
+**Firestore Collections:** None (membaca `products` yang sudah ada)
 
 ---
 
@@ -647,6 +636,8 @@ caseStudies (collection)
 | 31 Aug 2026 | `/bandingkan` jadi server component + client component ProductComparison | SEO & data produk langsung dari SSR; state perbandingan tetap di browser |
 | 31 Aug 2026 | WhatsApp Chat Widget dipasang di semua halaman publik (bukan hanya homepage) | Konsisten dengan floating button yang dulu; peluang konversi di semua halaman |
 | 31 Aug 2026 | Widget WA tanpa auto-show popup | Auto-popup berisiko mengganggu UX & dianggap spam; hanya muncul saat diklik |
+| 31 Aug 2026 | Katalog diubah jadi auto-generated dari data produk (bukan upload PDF admin) | Permintaan user: katalog otomatis update saat admin menambah produk; tanpa collection/storage baru |
+| 31 Aug 2026 | PDF katalog pakai jsPDF + jspdf-autotable di browser | Selalu sinkron dgn produk aktif; tanpa server PDF generation; download counter di-skip |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
@@ -693,12 +684,12 @@ caseStudies (collection)
 | Phase 1 | Kalkulator ROI Enhanced | ✅ SELESAI |
 | Phase 1 | Product Comparison | ✅ SELESAI |
 | Phase 2 | WhatsApp Chat Widget | ✅ SELESAI |
-| Phase 3 | Downloadable Catalog | ⏳ PENDING |
+| Phase 3 | Downloadable Catalog | ✅ SELESAI |
 | Phase 3 | Newsletter | ⏳ PENDING |
 | Phase 4 | Case Studies | ⏳ PENDING |
 | Phase 4 | Dark Mode | ⏳ PENDING |
 
-**Overall Progress:** 71% (10/14 fitur selesai)
+**Overall Progress:** 79% (11/14 fitur selesai)
 
 ---
 
