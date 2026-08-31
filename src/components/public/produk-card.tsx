@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight, MessageCircle, Scale } from "lucide-react";
 import { Card, CardImage, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
 import { useContact } from "@/contexts/contact-context";
-import { SITE_URL } from "@/lib/constants";
+import { useComparison } from "@/lib/comparison-store";
+import { COMPARISON_MAX, SITE_URL } from "@/lib/constants";
 
 interface ProdukCardProps {
   product: Product;
@@ -16,6 +17,8 @@ interface ProdukCardProps {
 export function ProdukCard({ product }: ProdukCardProps) {
   const { contact } = useContact();
   const waNumber = contact?.whatsappNumber || "6281326440039";
+  const comparison = useComparison();
+  const inComparison = comparison.has(product.id);
 
   const certBadge = product.certifications?.length
     ? product.certifications.join(", ")
@@ -97,6 +100,28 @@ export function ProdukCard({ product }: ProdukCardProps) {
             <MessageCircle className="w-3 h-3" />
              Nego Harga
           </Link>
+          <button
+            type="button"
+            onClick={() => comparison.toggle(product.id)}
+            disabled={comparison.isFull && !inComparison}
+            title={
+              comparison.isFull && !inComparison
+                ? `Maksimal ${COMPARISON_MAX} produk untuk dibandingkan`
+                : inComparison
+                ? "Hapus dari perbandingan"
+                : "Tambahkan ke perbandingan"
+            }
+            className={`flex items-center justify-center gap-1.5 border rounded-lg py-1.5 px-2 transition-colors tap-effect ${
+              inComparison
+                ? "bg-primary text-white border-primary"
+                : comparison.isFull
+                ? "border-gray-200 text-gray-300 cursor-not-allowed"
+                : "border-primary/30 text-primary hover:bg-primary hover:text-white"
+            }`}
+          >
+            <Scale className="w-3 h-3" />
+            {inComparison ? "Sedang Dibanding" : "Bandingkan"}
+          </button>
         </div>
       </CardContent>
     </Card>

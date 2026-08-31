@@ -256,29 +256,31 @@
 ---
 
 ### ✅ Fitur 2: Product Comparison Tool
-**Status:** ⏳ PENDING | **Estimasi:** 2-3 jam | **Priority:** HIGH
+**Status:** ✅ SELESAI | **Deployed:** 31 Agustus 2026 | **Priority:** HIGH
 
 **Description:** Fitur untuk membandingkan 2-3 produk mesin es kristal side-by-side.
 
 **Feature Checklist:**
-- [ ] Product selector (modal/dropdown)
-- [ ] Comparison table (kapasitas, daya, harga, garansi, sertifikasi, dimensi)
-- [ ] Highlight differences automatically
-- [ ] LocalStorage persistence
-- [ ] Share results via WhatsApp
-- [ ] Responsive (mobile: scroll horizontal, desktop: grid)
+- ✅ Product selector (dropdown tambah di halaman /bandingkan + tombol di kartu produk)
+- ✅ Comparison table (kapasitas, daya, harga, garansi, material, stok, kategori, sertifikasi, spesifikasi dinamis)
+- ✅ Highlight differences automatically
+- ✅ LocalStorage persistence (`comparison_ids_v1`, max 3)
+- ✅ Share results via WhatsApp (`buildComparisonWhatsAppMessage`)
+- ✅ Responsive (mobile: scroll horizontal, sticky kolom label)
+- ✅ Badge counter navbar (desktop + mobile) + tombol Bandingkan di produk-card (disabled saat penuh)
 
-**Files to Create:**
-- [ ] `src/app/(public)/bandingkan/page.tsx`
-- [ ] `src/components/public/product-comparison.tsx`
-- [ ] `src/components/public/product-selector.tsx`
-- [ ] `src/contexts/comparison-context.tsx`
-- [ ] `src/types/comparison.ts`
+**Files Created:**
+- ✅ `src/app/(public)/bandingkan/page.tsx` (server component, SEO metadata)
+- ✅ `src/components/public/product-comparison.tsx`
+- ✅ `src/lib/comparison-store.ts` (two-way binding via `useSyncExternalStore`)
+- ✅ `src/lib/comparison-message.ts`
 
-**Files to Modify:**
-- [ ] `src/components/public/produk-card.tsx` (add "Bandingkan" button)
-- [ ] `src/components/layout/navbar.tsx` (add comparison counter badge)
-- [ ] `src/lib/constants.ts` (add COMPARISON_MAX constant)
+**Files Modified:**
+- ✅ `src/components/public/produk-card.tsx` (add "Bandingkan" button)
+- ✅ `src/components/layout/navbar.tsx` (add comparison counter badge)
+- ✅ `src/lib/constants.ts` (add COMPARISON_MAX constant)
+
+**Catatan deviasi dari tracker awal:** `product-selector.tsx` digabung ke `product-comparison.tsx`; `comparison-context.tsx` & `types/comparison.ts` diganti `comparison-store.ts` (pola aka `roi_scenarios_v1`, tanpa Context Provider — konsisten dengan ROI).
 
 **Firestore Collections:** None (client-side only)
 
@@ -634,6 +636,8 @@ caseStudies (collection)
 | 31 Aug 2026 | Label navbar "Simulasi ROI" dipakai untuk fitur kalkulator | Lebih jelas maksudnya untuk calon pembeli |
 | 31 Aug 2026 | Chart ROI pakai custom SVG (tanpa library) + simpan skenario di localStorage | Ringan, tanpa dependency tambahan; skenario maks 5 |
 | 31 Aug 2026 | PDF export ROI di-skip | Whatsapp share dianggap cukup untuk konversi |
+| 31 Aug 2026 | Comparison pakai localStorage `comparison_ids_v1` + `useSyncExternalStore` (tanpa Context Provider) | Pola sama dengan ro pakai idiom yang sama, nyala otomatis di semua halaman (navbar + kartu) |
+| 31 Aug 2026 | `/bandingkan` jadi server component + client component ProductComparison | SEO & data produk langsung dari SSR; state perbandingan tetap di browser |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
@@ -643,6 +647,8 @@ caseStudies (collection)
 - Context API untuk shared state (theme, comparison)
 - FAQ Terkait sparepart memakai keyword matching (nama + kategori) dengan fallback kategori `teknis`
 - Skenario ROI (localStorage) dibaca/react dengan `useSyncExternalStore` (getServerSnapshot untuk SSR) — pola idiomatik, bebas lint `set-state-in-effect`
+- Comparison (localStorage) juga pakai `useSyncExternalStore` + event `storage` untuk sinkron lintas tab — sama seperti ROI
+- Perbandingan produk maksimal 3 (`COMPARISON_MAX`), sel dengan nilai berbeda di-highlight `bg-amber-50`
 
 ---
 
@@ -676,14 +682,14 @@ caseStudies (collection)
 | Branding | Branding & SEO Meta | ✅ SELESAI |
 | Sparepart | Enhancements Detail Sparepart | ✅ SELESAI |
 | Phase 1 | Kalkulator ROI Enhanced | ✅ SELESAI |
-| Phase 1 | Product Comparison | ⏳ PENDING |
+| Phase 1 | Product Comparison | ✅ SELESAI |
 | Phase 2 | WhatsApp Chat Widget | ⏳ PENDING |
 | Phase 3 | Downloadable Catalog | ⏳ PENDING |
 | Phase 3 | Newsletter | ⏳ PENDING |
 | Phase 4 | Case Studies | ⏳ PENDING |
 | Phase 4 | Dark Mode | ⏳ PENDING |
 
-**Overall Progress:** 57% (8/14 fitur selesai)
+**Overall Progress:** 64% (9/14 fitur selesai)
 
 ---
 

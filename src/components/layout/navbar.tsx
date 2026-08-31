@@ -10,9 +10,11 @@ import {
   Phone,
   LogIn,
   Search,
+  Scale,
 } from "lucide-react";
 import { useContact } from "@/contexts/contact-context";
 import { WHATSAPP_NUMBER, WHATSAPP_MESSAGE } from "@/lib/constants";
+import { useComparison } from "@/lib/comparison-store";
 import { ProdukSearchDropdown } from "@/components/public/produk-search-dropdown";
 
 const navLinks = [
@@ -29,6 +31,7 @@ const navLinks = [
 
 export function Navbar() {
   const { contact } = useContact();
+  const { items: comparisonItems } = useComparison();
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [initialQuery, setInitialQuery] = useState<string | undefined>(undefined);
@@ -111,6 +114,24 @@ export function Navbar() {
     setMobileMenuOpen(false);
   }
 
+  function renderComparisonButton() {
+    return (
+      <Link
+        href="/bandingkan"
+        className="relative p-2 rounded-lg text-gray-600 hover:text-primary hover:bg-gray-100 transition-colors tap-effect"
+        aria-label="Bandingkan produk"
+        onClick={closeMobileMenu}
+      >
+        <Scale className="w-5 h-5" />
+        {comparisonItems.length > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full leading-none">
+            {comparisonItems.length}
+          </span>
+        )}
+      </Link>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
       <nav className="w-full px-3 sm:px-5 lg:px-6 2xl:px-8 relative">
@@ -162,6 +183,7 @@ export function Navbar() {
 
           {/* Action Buttons (Desktop) */}
           <div className="hidden lg:flex items-center gap-3">
+            {renderComparisonButton()}
             <Link
               href="/admin/login"
               className="flex items-center gap-2 border border-gray-300 hover:border-primary text-gray-700 hover:text-primary px-2.5 xl:px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap"
@@ -180,8 +202,11 @@ export function Navbar() {
             </a>
           </div>
 
-          {/* Mobile Icons: Search, Menu */}
+          {/* Mobile Icons: Search, Comparison, Menu */}
           <div className="flex lg:hidden items-center gap-1 shrink-0">
+            {/* Comparison Icon */}
+            {renderComparisonButton()}
+
             {/* Search Icon */}
             <button
               onClick={handleSearchClick}

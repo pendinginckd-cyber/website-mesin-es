@@ -71,6 +71,8 @@ export const MAX_PRODUCT_IMAGES = 8;
 export const MIN_PRODUCT_IMAGES = 3;
 export const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
+export const COMPARISON_MAX = 3;
+
 export const SORT_OPTIONS = [
   { value: "default", label: "Urutkan" },
   { value: "price-asc", label: "Harga: Rendah ke Tinggi" },
