@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ArtikelCard } from "@/components/public/artikel-card";
+import { FaqAccordion } from "@/components/public/faq-accordion";
 import { ShareButton } from "@/components/shared/share-button";
 import { getArticleBySlug, getArticles } from "@/lib/firestore/articles";
+import { getRelatedFaqs } from "@/lib/firestore/faqs";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import type { Metadata } from "next";
 
@@ -63,6 +65,11 @@ export default async function ArtikelDetailPage({ params }: PageProps) {
     .filter((a) => a.category === article.category && a.id !== article.id)
     .slice(0, 3);
 
+  const relatedFaqs = await getRelatedFaqs(
+    [article.title, article.category, ...(article.tags ?? [])],
+    5
+  );
+
   const formattedDate = article.publishedAt
     ? new Intl.DateTimeFormat("id-ID", {
         day: "numeric",
@@ -114,6 +121,21 @@ export default async function ArtikelDetailPage({ params }: PageProps) {
             className="prose prose-gray max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-ul:list-disc prose-ol:list-decimal"
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
+        )}
+
+        {relatedFaqs.length > 0 && (
+          <div className="mt-16 pt-8 border-t border-gray-200">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              FAQ Terkait
+            </h2>
+            <FaqAccordion faqs={relatedFaqs} />
+            <Link
+              href="/faq"
+              className="mt-4 inline-block text-sm text-primary hover:underline"
+            >
+              Lihat semua FAQ
+            </Link>
+          </div>
         )}
 
         {relatedArticles.length > 0 && (
