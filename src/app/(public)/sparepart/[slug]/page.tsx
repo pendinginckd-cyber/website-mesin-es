@@ -12,6 +12,7 @@ import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ProductGallery } from "@/components/public/product-gallery";
 import { ShareButton } from "@/components/shared/share-button";
 import { FaqAccordion } from "@/components/public/faq-accordion";
+import { FaqJsonLd } from "@/components/shared/faq-jsonld";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -209,6 +210,8 @@ export default async function SparepartDetailPage({ params }: PageProps) {
           }),
         }}
       />
+
+      <FaqJsonLd faqs={relatedFaqs} />
 
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8">

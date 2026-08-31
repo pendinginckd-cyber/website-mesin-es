@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ArtikelCard } from "@/components/public/artikel-card";
 import { FaqAccordion } from "@/components/public/faq-accordion";
+import { FaqJsonLd } from "@/components/shared/faq-jsonld";
 import { ShareButton } from "@/components/shared/share-button";
 import { getArticleBySlug, getArticles } from "@/lib/firestore/articles";
 import { getRelatedFaqs } from "@/lib/firestore/faqs";
@@ -150,6 +151,8 @@ export default async function ArtikelDetailPage({ params }: PageProps) {
             </div>
           </div>
         )}
+
+        <FaqJsonLd faqs={relatedFaqs} />
       </div>
     </div>
   );

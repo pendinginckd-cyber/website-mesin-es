@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { getFaqs } from "@/lib/firestore/faqs";
 import { Faq } from "@/types/faq";
+import { FaqJsonLd } from "@/components/shared/faq-jsonld";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 
@@ -41,6 +42,7 @@ export function FaqSection() {
 
   return (
     <section className="py-16 bg-gray-50">
+      <FaqJsonLd faqs={faqs} />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
