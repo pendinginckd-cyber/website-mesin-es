@@ -50,6 +50,11 @@ export const articleSchema = z.object({
   category: z.string().min(1, "Kategori wajib diisi"),
   tags: z.array(z.string()).optional(),
   isPublished: z.boolean(),
+  seoTitle: z.string().max(60, "SEO Title maksimal 60 karakter").optional().or(z.literal("")),
+  seoDescription: z.string().max(160, "SEO Description maksimal 160 karakter").optional().or(z.literal("")),
+  seoKeywords: z.array(z.string()).optional(),
+  seoNoIndex: z.boolean().optional(),
+  seoCanonical: z.string().url("Canonical URL tidak valid").optional().or(z.literal("")),
 });
 
 export const testimonialSchema = z.object({

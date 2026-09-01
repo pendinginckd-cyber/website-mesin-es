@@ -21,17 +21,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Artikel Tidak Ditemukan" };
   }
 
+  const title = article.seoTitle || article.title;
+  const description = article.seoDescription || article.excerpt;
+  const canonical = article.seoCanonical || `${SITE_URL}/artikel/${slug}`;
+
   return {
-    title: `${article.title} | ${SITE_NAME}`,
-    description: article.excerpt,
+    title: `${title} | ${SITE_NAME}`,
+    description,
     alternates: {
-      canonical: `${SITE_URL}/artikel/${slug}`,
+      canonical,
     },
+    robots: article.seoNoIndex ? "noindex, nofollow" : "index, follow",
+    keywords: article.seoKeywords?.join(", "),
     openGraph: {
-      title: article.title,
-      description: article.excerpt,
+      title,
+      description,
       images: [{ url: article.coverImage, width: 1200, height: 630 }],
-      url: `${SITE_URL}/artikel/${slug}`,
+      url: canonical,
     },
   };
 }

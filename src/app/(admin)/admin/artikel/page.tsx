@@ -24,6 +24,11 @@ interface ArticleFormData {
   tags: string;
   isPublished: boolean;
   publishedAt: string;
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
+  seoNoIndex: boolean;
+  seoCanonical: string;
 }
 
 const initialFormData: ArticleFormData = {
@@ -37,6 +42,11 @@ const initialFormData: ArticleFormData = {
   tags: "",
   isPublished: false,
   publishedAt: new Date().toISOString().slice(0, 16),
+  seoTitle: "",
+  seoDescription: "",
+  seoKeywords: "",
+  seoNoIndex: false,
+  seoCanonical: "",
 };
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -109,6 +119,7 @@ export default function ArtikelAdmin() {
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [showCategoryInput, setShowCategoryInput] = useState(false);
+  const [showSeo, setShowSeo] = useState(false);
 
   useEffect(() => {
     fetchArticles();
@@ -166,6 +177,11 @@ export default function ArtikelAdmin() {
       publishedAt: article.publishedAt
         ? new Date(article.publishedAt).toISOString().slice(0, 16)
         : new Date().toISOString().slice(0, 16),
+      seoTitle: article.seoTitle || "",
+      seoDescription: article.seoDescription || "",
+      seoKeywords: (article.seoKeywords || []).join(", "),
+      seoNoIndex: article.seoNoIndex || false,
+      seoCanonical: article.seoCanonical || "",
     });
     setEditingId(article.id);
     setShowForm(true);
@@ -194,6 +210,11 @@ export default function ArtikelAdmin() {
         tags: formData.tags.split(",").map((t) => t.trim()).filter(Boolean),
         isPublished: formData.isPublished,
         publishedAt: new Date(formData.publishedAt),
+        seoTitle: formData.seoTitle.trim(),
+        seoDescription: formData.seoDescription.trim(),
+        seoKeywords: formData.seoKeywords.split(",").map((k) => k.trim()).filter(Boolean),
+        seoNoIndex: formData.seoNoIndex,
+        seoCanonical: formData.seoCanonical.trim(),
       };
 
       if (editingId) {
@@ -428,6 +449,62 @@ export default function ArtikelAdmin() {
                     </div>
                   </label>
                 </div>
+              </div>
+
+              <div className="border border-gray-200 rounded-lg">
+                <button type="button" onClick={() => setShowSeo(!showSeo)} className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-t-lg">
+                  <span className="font-medium text-gray-900">Pengaturan SEO (Opsional)</span>
+                  {showSeo ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                </button>
+                {showSeo && (
+                  <div className="p-4 space-y-4">
+                    <p className="text-sm text-gray-500">Kosongkan field di bawah untuk menggunakan nilai otomatis dari data artikel.</p>
+                    <div>
+                      <Label>SEO Title (max 60 karakter)</Label>
+                      <InputField
+                        name="seoTitle"
+                        value={formData.seoTitle}
+                        onChange={handleChange}
+                        maxLength={60}
+                        placeholder="Kosongkan untuk pakai judul artikel"
+                      />
+                    </div>
+                    <div>
+                      <Label>SEO Description (max 160 karakter)</Label>
+                      <textarea
+                        name="seoDescription"
+                        value={formData.seoDescription}
+                        onChange={(e) => handleChange("seoDescription", e.target.value)}
+                        rows={2}
+                        maxLength={160}
+                        placeholder="Kosongkan untuk pakai ringkasan artikel"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                      />
+                    </div>
+                    <div>
+                      <Label>Target Keywords (pisahkan dengan koma)</Label>
+                      <InputField
+                        name="seoKeywords"
+                        value={formData.seoKeywords}
+                        onChange={handleChange}
+                        placeholder="mesin es kristal, harga mesin es, jual mesin es"
+                      />
+                    </div>
+                    <div>
+                      <Label>Canonical URL</Label>
+                      <InputField
+                        name="seoCanonical"
+                        value={formData.seoCanonical}
+                        onChange={handleChange}
+                        placeholder="https://www.eskristalnusantara.com/artikel/slug"
+                      />
+                    </div>
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" name="seoNoIndex" checked={formData.seoNoIndex} onChange={(e) => handleChange("seoNoIndex", e.target.checked)} className="w-4 h-4 text-primary rounded" />
+                      <span className="text-sm">Sembunyikan dari Google (No Index)</span>
+                    </label>
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3 pt-4">

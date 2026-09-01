@@ -12,4 +12,9 @@ export interface Article {
   publishedAt: Date;
   createdAt: Date;
   updatedAt: Date;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string[];
+  seoNoIndex?: boolean;
+  seoCanonical?: string;
 }
