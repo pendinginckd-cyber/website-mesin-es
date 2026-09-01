@@ -662,6 +662,7 @@ caseStudies (collection)
 | 31 Aug 2026 | Perbaikan teknis SEO: `metadataBase` (hilang warning build), `og:image` homepage, sitemap robots.txt → www, JSON-LD Organization+WebSite di homepage | Fondasi indexing Google; situs baru 1 minggu butuh sinyal entitas & konsistensi URL |
 | 31 Aug 2026 | Hapus `aggregateRating` palsu (4.8/127 hardcoded) & field `weight` salah isi dari schema Product; deduplikasi image | Peringatan GSC (review & aggregate rating); rating tanpa ulasan nyata melanggar pedoman snippet produk. Fase lanjutan: review asli per produk untuk bintang Google (direncanakan, belum dieksekusi — DI-HOLD) |
 | 31 Aug 2026 | Detail produk & sparepart disamakan: bg-gray-50, komponen Breadcrumb di keduanya, judul/harga/heading seragam, CTA 2 tombol (`DetailCta` generik), sidebar sparepart + kartu Informasi & Butuh Bantuan, duplikasi Product JSON-LD dibersihkan di kedua halaman | Permintaan user: konsistensi tampilan antar halaman detail |
+| 31 Aug 2026 | Form artikel admin dapat seksi "Pengaturan SEO (Opsional)": SEO Title, SEO Description, Target Keywords, Canonical, No Index; metadata publik artikel memakainya dengan fallback ke judul/ringkasan | Parity dengan form produk; kontrol SEO per artikel untuk strategi long-tail |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
