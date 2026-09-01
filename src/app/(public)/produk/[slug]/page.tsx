@@ -174,7 +174,7 @@ export default async function ProdukDetailPage({ params }: PageProps) {
 
           <div className="space-y-6">
             <div>
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-3 mb-2">
                 <span className={`px-3 py-1 text-xs font-medium rounded-full ${getCategoryColor(product.category)}`}>
                   Kapasitas {product.capacity}
                 </span>
@@ -189,10 +189,7 @@ export default async function ProdukDetailPage({ params }: PageProps) {
               <p className="text-2xl lg:text-3xl font-bold text-primary">
                 {product.priceDisplay}
               </p>
-            </div>
-
-            <div className="prose prose-gray max-w-none">
-              <p className="text-gray-600 leading-relaxed">
+              <p className="mt-3 text-gray-600 leading-relaxed">
                 {product.shortDescription}
               </p>
             </div>

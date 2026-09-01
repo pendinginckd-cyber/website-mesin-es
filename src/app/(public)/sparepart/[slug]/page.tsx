@@ -209,7 +209,7 @@ export default async function SparepartDetailPage({ params }: PageProps) {
             {/* Info */}
             <div className="space-y-6">
               <div>
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-2">
                   <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                     {sparepart.category}
                   </span>
@@ -223,10 +223,7 @@ export default async function SparepartDetailPage({ params }: PageProps) {
                 <p className="text-2xl lg:text-3xl font-bold text-primary">
                   Rp {sparepart.price.toLocaleString("id-ID")}
                 </p>
-              </div>
-
-              <div className="prose prose-gray max-w-none">
-                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                <p className="mt-3 text-gray-600 leading-relaxed whitespace-pre-line">
                   {sparepart.shortDescription || sparepart.description}
                 </p>
               </div>
