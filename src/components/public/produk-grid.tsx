@@ -8,12 +8,15 @@ interface ProdukGridProps {
   loading?: boolean;
   title?: string;
   showViewAll?: boolean;
+  compact?: boolean;
 }
 
-export function ProdukGrid({ products, loading = false, title, showViewAll = false }: ProdukGridProps) {
+export function ProdukGrid({ products, loading = false, title, showViewAll = false, compact = false }: ProdukGridProps) {
+  const sectionClass = compact ? "pb-12 sm:pb-16" : "py-16 sm:py-20";
+
   if (loading) {
     return (
-      <section className="py-16 sm:py-20">
+      <section className={sectionClass}>
         <div className="max-w-7xl mx-auto">
           {title && (
             <div className="text-center mb-12 px-4 sm:px-6 lg:px-8">
@@ -33,7 +36,7 @@ export function ProdukGrid({ products, loading = false, title, showViewAll = fal
   if (products.length === 0) return null;
 
   return (
-    <section className="py-16 sm:py-20">
+    <section className={sectionClass}>
       <div className="max-w-7xl mx-auto">
         {title && (
           <div className="text-center mb-12 px-4 sm:px-6 lg:px-8">

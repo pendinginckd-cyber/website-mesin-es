@@ -40,20 +40,20 @@ function ProdukPageContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto py-12">
+      <div className="max-w-7xl mx-auto pt-6 pb-12 sm:pt-12">
         <div className="px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-blue-900 mb-4">
+          <div className="text-center mb-5 sm:mb-8">
+            <h1 className="text-xl sm:text-4xl font-bold text-blue-900 mb-2 sm:mb-4">
               Katalog Mesin Es Kristal
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
               Pilihan mesin es kristal berkualitas untuk kebutuhan usaha Anda.
             </p>
           </div>
 
           {/* Active Search Chip */}
           {activeSearch && (
-            <div className="flex items-center justify-center mb-8">
+            <div className="flex items-center justify-center mb-5 sm:mb-8">
               <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full pl-4 pr-2 py-2 shadow-sm">
                 <span className="text-sm text-gray-700">
                   Hasil pencarian:{" "}
@@ -72,7 +72,7 @@ function ProdukPageContent() {
         </div>
 
         {/* Product Grid */}
-        <ProdukGrid products={filteredProducts} loading={loading} />
+        <ProdukGrid products={filteredProducts} loading={loading} compact />
 
         {/* Empty State */}
         {!loading && !filteredProducts.length && (
