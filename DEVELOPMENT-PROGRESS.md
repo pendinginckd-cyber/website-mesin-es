@@ -663,6 +663,7 @@ caseStudies (collection)
 | 31 Aug 2026 | Hapus `aggregateRating` palsu (4.8/127 hardcoded) & field `weight` salah isi dari schema Product; deduplikasi image | Peringatan GSC (review & aggregate rating); rating tanpa ulasan nyata melanggar pedoman snippet produk. Fase lanjutan: review asli per produk untuk bintang Google (direncanakan, belum dieksekusi — DI-HOLD) |
 | 31 Aug 2026 | Detail produk & sparepart disamakan: bg-gray-50, komponen Breadcrumb di keduanya, judul/harga/heading seragam, CTA 2 tombol (`DetailCta` generik), sidebar sparepart + kartu Informasi & Butuh Bantuan, duplikasi Product JSON-LD dibersihkan di kedua halaman | Permintaan user: konsistensi tampilan antar halaman detail |
 | 31 Aug 2026 | Form artikel admin dapat seksi "Pengaturan SEO (Opsional)": SEO Title, SEO Description, Target Keywords, Canonical, No Index; metadata publik artikel memakainya dengan fallback ke judul/ringkasan | Parity dengan form produk; kontrol SEO per artikel untuk strategi long-tail |
+| 1 Sep 2026 | Fix form produk: tombol "Tambah Spec" terlihat tidak berfungsi karena `handleExtraSpecChange` mem-filter baris extra spec hanya jika label DAN value keduanya terisi (&&), sehingga baris hilang begitu user mengetik salah satu field; diganti jadi `||` (row hanya dihapus bila keduanya kosong) | Laporan user: tombol tambah spec tidak berfungsi |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
