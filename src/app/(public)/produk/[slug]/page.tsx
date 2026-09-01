@@ -1,7 +1,7 @@
 import { getProductBySlug } from "@/lib/firestore/products";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle, Phone, MessageCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductGallery } from "@/components/public/product-gallery";
@@ -9,6 +9,7 @@ import { ProductSpecsTable } from "@/components/public/product-specs-table";
 import { ProductCta } from "@/components/public/product-cta";
 import { ShareButton } from "@/components/shared/share-button";
 import { ProductRelatedSection } from "@/components/public/product-related-section";
+import { Breadcrumb } from "@/components/shared/breadcrumb";
 import type { Metadata } from "next";
 
 const PRICE_VALID_UNTIL = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
@@ -41,32 +42,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     "mesin es batu",
   ].join(", ");
 
-  const productSchema = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": product.seoTitle || product.name,
-    "image": Array.from(new Set([product.thumbnail, ...product.images])),
-    "description": product.description,
-    "sku": product.slug,
-    "mpn": product.slug,
-    "brand": { "@type": "Brand", "name": SITE_NAME },
-    "category": product.category,
-    "material": product.material,
-    "offers": {
-      "@type": "Offer",
-      "url": canonical,
-      "priceCurrency": "IDR",
-      "price": product.price,
-      "priceValidUntil": PRICE_VALID_UNTIL,
-      "availability": product.stock === "tersedia"
-        ? "https://schema.org/InStock"
-        : product.stock === "indent"
-        ? "https://schema.org/PreOrder"
-        : "https://schema.org/OutOfStock",
-      "seller": { "@type": "Organization", "name": SITE_NAME },
-    },
-  };
-
   return {
     title,
     description,
@@ -93,9 +68,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: product.seoTitle || product.name,
       description,
       images: [product.thumbnail],
-    },
-    other: {
-      "script:ld+json": JSON.stringify(productSchema),
     },
   };
 }
@@ -130,8 +102,8 @@ export default async function ProdukDetailPage({ params }: PageProps) {
 
   if (!product) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Produk Tidak Ditemukan</h1>
           <p className="text-gray-600 mb-8">
             Maaf, produk yang Anda cari tidak tersedia atau telah dihapus.
@@ -159,7 +131,7 @@ export default async function ProdukDetailPage({ params }: PageProps) {
             "@context": "https://schema.org",
             "@type": "Product",
             "name": product.seoTitle || product.name,
-            "image": [product.thumbnail, ...product.images],
+            "image": Array.from(new Set([product.thumbnail, ...product.images])),
             "description": product.description,
             "sku": product.slug,
             "mpn": product.slug,
@@ -183,16 +155,16 @@ export default async function ProdukDetailPage({ params }: PageProps) {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-primary">Beranda</Link>
-          <span>/</span>
-          <Link href="/produk" className="hover:text-primary">Produk</Link>
-          <span>/</span>
-          <span className="text-gray-900">{product.name}</span>
-        </nav>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Breadcrumb
+            items={[
+              { label: "Produk", href: "/produk" },
+              { label: product.name },
+            ]}
+          />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <ProductGallery
             thumbnail={product.thumbnail}
             images={product.images}
@@ -378,6 +350,7 @@ export default async function ProdukDetailPage({ params }: PageProps) {
           currentSlug={product.slug}
           category={product.category}
         />
+        </div>
       </div>
     </>
   );
