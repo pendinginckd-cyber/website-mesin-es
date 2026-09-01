@@ -99,17 +99,19 @@ export function ProductRelatedSection({ currentSlug, category }: ProductRelatedS
       {/* Section: Produk Terkait */}
       {relatedProducts.length > 0 && (
         <section className="mt-16 pt-8 border-t border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center">
-              Produk Terkait
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="px-4 sm:px-6 lg:px-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center">
+                Produk Terkait
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-6 px-0 sm:px-6 lg:px-8">
               {relatedProducts.map((relatedProduct) => (
                 <ProdukCard key={relatedProduct.slug} product={relatedProduct} />
               ))}
             </div>
             {relatedHasMore && (
-              <div className="text-center mt-8">
+              <div className="text-center mt-8 px-4 sm:px-6 lg:px-8">
                 <button
                   onClick={handleLoadMoreRelated}
                   disabled={relatedLoading}
@@ -127,17 +129,19 @@ export function ProductRelatedSection({ currentSlug, category }: ProductRelatedS
       {/* Section: Produk Lainnya */}
       {otherProducts.length > 0 && (
         <section className="mt-16 pt-8 border-t border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center">
-              Produk Lainnya
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="px-4 sm:px-6 lg:px-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center">
+                Produk Lainnya
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-6 px-0 sm:px-6 lg:px-8">
               {otherProducts.map((otherProduct) => (
                 <ProdukCard key={otherProduct.slug} product={otherProduct} />
               ))}
             </div>
             {otherHasMore && (
-              <div className="text-center mt-8">
+              <div className="text-center mt-8 px-4 sm:px-6 lg:px-8">
                 <button
                   onClick={handleLoadMoreOther}
                   disabled={otherLoading}

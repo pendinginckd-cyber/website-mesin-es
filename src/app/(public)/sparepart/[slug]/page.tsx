@@ -315,7 +315,7 @@ export default async function SparepartDetailPage({ params }: PageProps) {
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
                 Produk Terkait
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-6">
                 {relatedProducts.map((product) => (
                   <ProdukCard key={product.id} product={product} />
                 ))}
@@ -329,7 +329,7 @@ export default async function SparepartDetailPage({ params }: PageProps) {
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
                 Produk Lainnya
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6">
                 {mixItems.map((item) => (
                   <SparepartCard
                     key={`${item.kind}-${item.id}`}

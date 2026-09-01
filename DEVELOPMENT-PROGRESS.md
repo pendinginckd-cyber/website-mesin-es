@@ -664,6 +664,7 @@ caseStudies (collection)
 | 31 Aug 2026 | Detail produk & sparepart disamakan: bg-gray-50, komponen Breadcrumb di keduanya, judul/harga/heading seragam, CTA 2 tombol (`DetailCta` generik), sidebar sparepart + kartu Informasi & Butuh Bantuan, duplikasi Product JSON-LD dibersihkan di kedua halaman | Permintaan user: konsistensi tampilan antar halaman detail |
 | 31 Aug 2026 | Form artikel admin dapat seksi "Pengaturan SEO (Opsional)": SEO Title, SEO Description, Target Keywords, Canonical, No Index; metadata publik artikel memakainya dengan fallback ke judul/ringkasan | Parity dengan form produk; kontrol SEO per artikel untuk strategi long-tail |
 | 1 Sep 2026 | Fix form produk: tombol "Tambah Spec" terlihat tidak berfungsi karena `handleExtraSpecChange` mem-filter baris extra spec hanya jika label DAN value keduanya terisi (&&), sehingga baris hilang begitu user mengetik salah satu field; diganti jadi `||` (row hanya dihapus bila keduanya kosong) | Laporan user: tombol tambah spec tidak berfungsi |
+| 1 Sep 2026 | Samakan grid section "Produk Terkait" & "Produk Lainnya" di detail produk (product-related-section) agar identik dengan page /produk: full-bleed mobile (px-0 gap-2), 5/6 kolom di xl/2xl; di detail sparepart "Produk Terkait" samakan kolom & gap (tetap dalam container px-4) | Klarifikasi user opsi 1: samakan grid sepenuhnya |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
