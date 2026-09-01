@@ -8,7 +8,7 @@ import { CTASection } from "@/components/public/cta-section";
 import { VisitorStatsDisplay } from "@/components/public/visitor-stats-display";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { getFeaturedProducts, getProducts } from "@/lib/firestore/products";
-import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import { SITE_NAME, SITE_URL, WHATSAPP_NUMBER } from "@/lib/constants";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -28,6 +28,14 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: SITE_NAME,
     type: "website",
+    images: [
+      {
+        url: "/icon.png",
+        width: 512,
+        height: 512,
+        alt: SITE_NAME,
+      },
+    ],
   },
   alternates: {
     canonical: SITE_URL,
@@ -42,6 +50,34 @@ export default async function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                name: SITE_NAME,
+                url: SITE_URL,
+                logo: `${SITE_URL}/icon.png`,
+                contactPoint: {
+                  "@type": "ContactPoint",
+                  telephone: `+${WHATSAPP_NUMBER}`,
+                  contactType: "sales",
+                  areaServed: "ID",
+                  availableLanguage: "Indonesian",
+                },
+              },
+              {
+                "@type": "WebSite",
+                name: SITE_NAME,
+                url: SITE_URL,
+              },
+            ],
+          }),
+        }}
+      />
       <HeroSection />
       <BannerCarousel />
       <ScrollReveal>
