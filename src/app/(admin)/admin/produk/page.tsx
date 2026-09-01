@@ -194,7 +194,9 @@ export default function ProdukAdmin() {
       const nonExtras = prev.specifications.filter(
         (s) => !(s.category === category && !SPEC_CATEGORY_FIELDS.some((f) => f.label === s.label))
       );
-      const cleaned = extras.filter((s) => s.label.trim() !== "" && s.value.trim() !== "");
+      const cleaned = extras.filter(
+        (s) => s.label.trim() !== "" || s.value.trim() !== ""
+      );
       return { ...prev, specifications: [...nonExtras, ...cleaned] };
     });
   }
