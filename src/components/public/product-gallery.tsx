@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
@@ -28,6 +28,21 @@ export function ProductGallery({ thumbnail, images, videoUrl, productName }: Pro
     const currentIndex = allImages.indexOf(mainImage);
     const newIndex = (currentIndex + dir + allImages.length) % allImages.length;
     setMainImage(allImages[newIndex]);
+  };
+
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(delta) > 50) {
+      navigateMainImage(delta < 0 ? 1 : -1);
+    }
+    touchStartX.current = null;
   };
 
   return (
@@ -68,6 +83,8 @@ export function ProductGallery({ thumbnail, images, videoUrl, productName }: Pro
               <button
                 type="button"
                 onClick={() => setLightboxIndex(allImages.indexOf(mainImage))}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
                 className="w-full h-full"
                 aria-label="Lihat gambar besar"
               >
@@ -83,6 +100,13 @@ export function ProductGallery({ thumbnail, images, videoUrl, productName }: Pro
                   <ZoomIn className="w-8 h-8 text-white/70 drop-shadow-lg" />
                 </div>
               </button>
+
+              {/* Mobile image counter */}
+              {allImages.length > 1 && (
+                <div className="absolute bottom-2 right-2 sm:hidden bg-black/50 text-white text-xs px-2 py-0.5 rounded-full pointer-events-none">
+                  {allImages.indexOf(mainImage) + 1}/{allImages.length}
+                </div>
+              )}
 
               {/* Navigation Arrows */}
               {allImages.length > 1 && (
@@ -150,7 +174,7 @@ export function ProductGallery({ thumbnail, images, videoUrl, productName }: Pro
 
       {/* Thumbnail Gallery */}
       {activeTab === "gambar" && allImages.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="hidden sm:flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {allImages.slice(0, 8).map((img, idx) => (
             <button
               key={idx}
