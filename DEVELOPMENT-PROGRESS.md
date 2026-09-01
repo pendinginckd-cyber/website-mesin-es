@@ -659,6 +659,7 @@ caseStudies (collection)
 | 31 Aug 2026 | Spesifikasi produk distrukturkan jadi 6 kategori (`Specification.category?`; form admin accordion per kategori; tambah field bebas per kategori; display publik dikelompokkan + tombol "Lihat Lebih Banyak" bila >12 baris) | Skema standar mesin es kristal agar mudah dibaca calon pembeli; `category` optional agar data lama tetap tampil di grup "Spesifikasi Lainnya" tanpa migrasi |
 | 31 Aug 2026 | Kartu produk gaya marketplace: gambar 1:1, aksi 1 baris (Nego + ikon Bandingkan), grid full-bleed di HP (`px-0 gap-2`), link "Lihat Spesifikasi" dihapus | Permintaan user: kartu lama terlalu tinggi (3 tombol bertumpuk) & tidak full layar di HP; mengikuti konsep Shopee/Tokopedia |
 | 31 Aug 2026 | Kartu sparepart disamakan: komponen `SparepartCard` (tanpa tombol, tap = detail, badge stok overlay), grid `/sparepart` full-bleed + skeleton loading, detail sparepart pakai `ProdukCard` (terkait) & `SparepartCard` (campuran) | Konsistensi tampilan marketplace lintas produk & sparepart |
+| 31 Aug 2026 | Perbaikan teknis SEO: `metadataBase` (hilang warning build), `og:image` homepage, sitemap robots.txt → www, JSON-LD Organization+WebSite di homepage | Fondasi indexing Google; situs baru 1 minggu butuh sinyal entitas & konsistensi URL |
 
 ### Technical Notes:
 - Semua fitur public pages tetap menggunakan **Server Components** untuk SEO
