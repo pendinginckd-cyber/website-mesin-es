@@ -4,12 +4,14 @@ import { getRelatedFaqs } from "@/lib/firestore/faqs";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 import Link from "next/link";
-import { ArrowLeft, Phone, ChevronLeft, ChevronRight, Package } from "lucide-react";
+import { ArrowLeft, Phone, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ProductGallery } from "@/components/public/product-gallery";
+import { ProdukCard } from "@/components/public/produk-card";
+import { SparepartCard } from "@/components/public/sparepart-card";
 import { ShareButton } from "@/components/shared/share-button";
 import { FaqAccordion } from "@/components/public/faq-accordion";
 import { FaqJsonLd } from "@/components/shared/faq-jsonld";
@@ -324,37 +326,9 @@ export default async function SparepartDetailPage({ params }: PageProps) {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Produk Terkait
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {relatedProducts.map((product) => (
-                  <Link key={product.id} href={`/produk/${product.slug}`}>
-                    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
-                      <div className="aspect-square bg-gray-100 relative">
-                        {product.thumbnail ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={product.thumbnail}
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <Package className="w-8 h-8" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-4 flex-1 flex flex-col">
-                        <Badge className="bg-blue-100 text-blue-800 w-fit mb-2">
-                          {product.category}
-                        </Badge>
-                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                          {product.name}
-                        </h3>
-                        <p className="text-lg font-bold text-primary">
-                          {product.priceDisplay}
-                        </p>
-                      </div>
-                    </Card>
-                  </Link>
+                  <ProdukCard key={product.id} product={product} />
                 ))}
               </div>
             </div>
@@ -366,52 +340,18 @@ export default async function SparepartDetailPage({ params }: PageProps) {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Produk Lainnya
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {mixItems.map((item) => (
-                  <Link
+                  <SparepartCard
                     key={`${item.kind}-${item.id}`}
+                    name={item.name}
+                    slug={item.slug}
+                    thumbnail={item.thumbnail}
+                    priceText={item.priceText}
+                    category={item.category}
+                    stock={item.stock}
                     href={item.kind === "produk" ? `/produk/${item.slug}` : `/sparepart/${item.slug}`}
-                  >
-                    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
-                      <div className="aspect-square bg-gray-100 relative">
-                        {item.thumbnail ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={item.thumbnail}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <Package className="w-8 h-8" />
-                          </div>
-                        )}
-                        <div className="absolute top-2 right-2">
-                          <Badge className={item.stock === "tersedia" ? "bg-green-500 text-white" : item.stock === "indent" ? "bg-yellow-500 text-white" : "bg-red-500 text-white"}>
-                            {item.stock}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="p-4 flex-1 flex flex-col">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <Badge className="bg-blue-100 text-blue-800 w-fit truncate">
-                            {item.category}
-                          </Badge>
-                          {item.kind === "sparepart" && (
-                            <span className="text-[10px] uppercase tracking-wide text-gray-400 shrink-0">
-                              Sparepart
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                          {item.name}
-                        </h3>
-                        <p className="text-lg font-bold text-primary">
-                          {item.priceText}
-                        </p>
-                      </div>
-                    </Card>
-                  </Link>
+                  />
                 ))}
               </div>
             </div>

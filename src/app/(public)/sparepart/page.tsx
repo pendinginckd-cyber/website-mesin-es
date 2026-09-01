@@ -2,14 +2,13 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import { getSpareparts } from "@/lib/firestore/spareparts";
 import { getSparepartSettings } from "@/lib/firestore/sparepart-settings";
 import { Sparepart } from "@/types/sparepart";
 import { Filter, X } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { CardSkeleton } from "@/components/ui/skeleton";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
+import { SparepartCard } from "@/components/public/sparepart-card";
 
 function SparepartPageContent() {
   const searchParams = useSearchParams();
@@ -86,30 +85,50 @@ function SparepartPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto py-8">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <Breadcrumb
+              items={[
+                { label: "Beranda", href: "/" },
+                { label: "Sparepart" },
+              ]}
+            />
+            <div className="mt-6 mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-3">
+                Sparepart Mesin Es Kristal
+              </h1>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-6 px-0 sm:px-6 lg:px-8">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <Breadcrumb
-          items={[
-            { label: "Beranda", href: "/" },
-            { label: "Sparepart" },
-          ]}
-        />
+      <div className="max-w-7xl mx-auto py-8">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <Breadcrumb
+            items={[
+              { label: "Beranda", href: "/" },
+              { label: "Sparepart" },
+            ]}
+          />
 
-        <div className="mt-6 mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">
-            Sparepart Mesin Es Kristal
-          </h1>
-          <p className="text-gray-600">
-            Tersedia berbagai sparepart berkualitas untuk semua tipe mesin es kristal. Hubungi kami untuk pemesanan.
-          </p>
-        </div>
+          <div className="mt-6 mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">
+              Sparepart Mesin Es Kristal
+            </h1>
+            <p className="text-gray-600">
+              Tersedia berbagai sparepart berkualitas untuk semua tipe mesin es kristal. Hubungi kami untuk pemesanan.
+            </p>
+          </div>
 
         {/* Active Filters */}
         {(activeSearch || activeCategory) && (
@@ -163,10 +182,11 @@ function SparepartPageContent() {
             </select>
           </div>
         )}
+        </div>
 
         {/* Grid */}
         {filtered.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-lg border border-dashed border-gray-300">
+          <div className="mx-4 sm:mx-6 lg:mx-8 text-center py-16 bg-white rounded-lg border border-dashed border-gray-300">
             <p className="text-gray-500">
               {activeSearch || activeCategory
                 ? "Tidak ada sparepart yang sesuai dengan pencarian Anda."
@@ -174,45 +194,17 @@ function SparepartPageContent() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-6 px-0 sm:px-6 lg:px-8">
             {filtered.map((sparepart) => (
-              <Link key={sparepart.id} href={`/sparepart/${sparepart.slug}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
-                  <div className="aspect-square bg-gray-100 relative">
-                    {sparepart.thumbnail ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={sparepart.thumbnail}
-                        alt={sparepart.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <span className="text-sm">No Image</span>
-                      </div>
-                    )}
-                    <div className="absolute top-2 right-2">
-                      <Badge className={sparepart.stock === "tersedia" ? "bg-green-500 text-white" : sparepart.stock === "indent" ? "bg-yellow-500 text-white" : "bg-red-500 text-white"}>
-                        {sparepart.stock}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col">
-                    <Badge className="bg-blue-100 text-blue-800 w-fit mb-2">
-                      {sparepart.category}
-                    </Badge>
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                      {sparepart.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 mb-3 line-clamp-2 flex-1">
-                      {sparepart.shortDescription}
-                    </p>
-                    <p className="text-lg font-bold text-primary">
-                      Rp {sparepart.price.toLocaleString("id-ID")}
-                    </p>
-                  </div>
-                </Card>
-              </Link>
+              <SparepartCard
+                key={sparepart.id}
+                name={sparepart.name}
+                slug={sparepart.slug}
+                thumbnail={sparepart.thumbnail}
+                priceText={`Rp ${sparepart.price.toLocaleString("id-ID")}`}
+                category={sparepart.category}
+                stock={sparepart.stock}
+              />
             ))}
           </div>
         )}
