@@ -45,14 +45,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     "@context": "https://schema.org",
     "@type": "Product",
     "name": product.seoTitle || product.name,
-    "image": [product.thumbnail, ...product.images],
+    "image": Array.from(new Set([product.thumbnail, ...product.images])),
     "description": product.description,
     "sku": product.slug,
     "mpn": product.slug,
     "brand": { "@type": "Brand", "name": SITE_NAME },
     "category": product.category,
     "material": product.material,
-    "weight": { "@type": "QuantitativeValue", "value": product.capacityValue, "unitCode": "TON" },
     "offers": {
       "@type": "Offer",
       "url": canonical,
@@ -66,11 +65,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         : "https://schema.org/OutOfStock",
       "seller": { "@type": "Organization", "name": SITE_NAME },
     },
-    "aggregateRating": product.isFeatured ? {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "127",
-    } : undefined,
   };
 
   return {
