@@ -13,11 +13,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Mesin Es Kristal Berkualitas | Garansi Resmi & Hemat Listrik",
+    default: "Jual Mesin Es Kristal Semarang | Pabrik & Service Ice Tube",
     template: "%s | Mesin Es Kristal",
   },
   description:
-    "Jual mesin es kristal kapasitas 1-10 ton/hari. Garansi resmi, suku cadang lengkap, teknisi siap datang. Konsultasi gratis!",
+    "Pabrik & supplier mesin es kristal (ice tube) di Genuk Semarang oleh Cikal Jaya Teknik, merk EKN. Kapasitas 1-10 ton, garansi resmi, sparepart lengkap. Konsultasi gratis!",
   keywords: [
     "jual mesin es kristal",
     "harga mesin es kristal",

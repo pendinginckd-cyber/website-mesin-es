@@ -9,22 +9,36 @@ import { VisitorStatsDisplay } from "@/components/public/visitor-stats-display";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { getFeaturedProducts, getProducts } from "@/lib/firestore/products";
 import { SITE_NAME, SITE_URL, WHATSAPP_NUMBER } from "@/lib/constants";
+import {
+  COMPANY_NAME,
+  BRAND,
+  BUSINESS_ADDRESS,
+  BUSINESS_GEO,
+  BUSINESS_PHONE,
+  BUSINESS_MAPS_SHORT,
+  BUSINESS_HOURS,
+  SERVICE_AREAS,
+} from "@/lib/business";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Mesin Es Kristal Berkualitas | Garansi Resmi & Hemat Listrik",
+  title: "Jual Mesin Es Kristal Semarang | Pabrik & Service Ice Tube",
   description:
-    "Jual mesin es kristal kapasitas 1-10 ton/hari. Garansi resmi, suku cadang lengkap, teknisi siap datang. Konsultasi gratis!",
+    "Pabrik & supplier mesin es kristal (ice tube) di Genuk Semarang oleh Cikal Jaya Teknik, merk EKN. Kapasitas 1-10 ton/hari, garansi resmi, sparepart lengkap, teknisi siap datang. Konsultasi gratis!",
   keywords: [
+    "mesin es kristal semarang",
+    "jual mesin es kristal semarang",
+    "pabrik mesin es kristal semarang",
+    "harga mesin es kristal semarang",
     "jual mesin es kristal",
     "harga mesin es kristal",
     "mesin es batu kristal",
     "mesin es kristal murah",
   ],
   openGraph: {
-    title: "Mesin Es Kristal Berkualitas | Garansi Resmi & Hemat Listrik",
+    title: "Jual Mesin Es Kristal Semarang | Pabrik & Service Ice Tube",
     description:
-      "Jual mesin es kristal kapasitas 1-10 ton/hari. Garansi resmi, suku cadang lengkap, teknisi siap datang.",
+      "Pabrik & supplier mesin es kristal (ice tube) di Genuk Semarang oleh Cikal Jaya Teknik, merk EKN. Kapasitas 1-10 ton, garansi resmi, sparepart lengkap.",
     url: SITE_URL,
     siteName: SITE_NAME,
     type: "website",
@@ -47,6 +61,32 @@ export default async function HomePage() {
   if (featuredProducts.length === 0) {
     featuredProducts = await getProducts({ isActive: true });
   }
+
+  const localBusinessSchema = {
+    "@type": "IndustrialBusiness",
+    name: COMPANY_NAME,
+    alternateName: `${SITE_NAME} (Merk ${BRAND})`,
+    image: `${SITE_URL}/icon.png`,
+    url: SITE_URL,
+    telephone: BUSINESS_PHONE,
+    address: {
+      "@type": "PostalAddress",
+      ...BUSINESS_ADDRESS,
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: BUSINESS_GEO.latitude,
+      longitude: BUSINESS_GEO.longitude,
+    },
+    hasMap: BUSINESS_MAPS_SHORT,
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: BUSINESS_HOURS.days,
+      opens: BUSINESS_HOURS.opens,
+      closes: BUSINESS_HOURS.closes,
+    },
+    areaServed: [...SERVICE_AREAS],
+  };
 
   return (
     <>
@@ -74,6 +114,7 @@ export default async function HomePage() {
                 name: SITE_NAME,
                 url: SITE_URL,
               },
+              localBusinessSchema,
             ],
           }),
         }}

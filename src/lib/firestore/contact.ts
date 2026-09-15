@@ -13,6 +13,7 @@ import {
   decodeSafe,
 } from "@/lib/constants";
 import { normalizeWaPhone } from "@/lib/phone";
+import { BUSINESS_ADDRESS_FULL, BUSINESS_PHONE_DISPLAY, BUSINESS_HOURS } from "@/lib/business";
 
 const CONTACT_DOC_ID = "default";
 
@@ -61,9 +62,9 @@ function getDefaultContactInfo(): ContactInfo {
     id: CONTACT_DOC_ID,
     whatsappNumber: WHATSAPP_NUMBER,
     whatsappMessage: WHATSAPP_MESSAGE,
-    email: "",
-    address: "",
-    operatingHours: "",
+    email: "info@eskristalnusantara.com",
+    address: BUSINESS_ADDRESS_FULL,
+    operatingHours: `Senin - Sabtu: ${BUSINESS_HOURS.opens} - ${BUSINESS_HOURS.closes} WIB (Telp: ${BUSINESS_PHONE_DISPLAY})`,
     googleMapsEmbed: "",
     description: "",
     updatedAt: new Date(),

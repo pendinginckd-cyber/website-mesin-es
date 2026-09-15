@@ -13,6 +13,7 @@ const quickLinks = [
   { href: "/artikel", label: "Artikel" },
   { href: "/faq", label: "FAQ" },
   { href: "/kalkulator", label: "Simulasi ROI" },
+  { href: "/mesin-es-kristal-semarang", label: "Mesin Es Kristal Semarang" },
   { href: "/tentang", label: "Tentang Kami" },
   { href: "/kontak", label: "Kontak" },
 ];
@@ -97,8 +98,8 @@ export function Footer() {
                     {contact.email}
                   </a>
                 ) : (
-                  <a href="mailto:info@mesineskristal.com" className="hover:text-primary transition-colors">
-                    info@mesineskristal.com
+                  <a href="mailto:info@eskristalnusantara.com" className="hover:text-primary transition-colors">
+                    info@eskristalnusantara.com
                   </a>
                 )}
               </li>
